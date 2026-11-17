@@ -1,0 +1,19 @@
+name: shokz-poc
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shokz
+      POSTGRES_PASSWORD: shokz_local_poc
+      POSTGRES_DB: shokz
+    ports:
+      - "127.0.0.1:5442:5432"
+    volumes:
+      - shokz_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shokz -d shokz"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+volumes:
+  shokz_postgres:

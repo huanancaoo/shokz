@@ -1,0 +1,218 @@
+"use client"
+
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ArrowDown01Icon,
+  Location01Icon,
+  Logout01Icon,
+  PackageIcon,
+  UserIcon,
+} from "@hugeicons/core-free-icons"
+
+import { cn as clx } from "@lib/utils"
+import { useParams, usePathname } from "next/navigation"
+
+import { signout } from "@lib/data/customer"
+import { HttpTypes } from "@medusajs/types"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+
+const AccountNav = ({
+  customer,
+}: {
+  customer: HttpTypes.StoreCustomer | null
+}) => {
+  const route = usePathname()
+  const { countryCode } = useParams() as { countryCode: string }
+
+  const handleLogout = async () => {
+    await signout(countryCode)
+  }
+
+  return (
+    <div>
+      <div className="small:hidden" data-testid="mobile-account-nav">
+        {route !== `/${countryCode}/account` ? (
+          <LocalizedClientLink
+            href="/account"
+            className="flex items-center gap-x-2 text-small-regular py-2"
+            data-testid="account-main-link"
+          >
+            <>
+              <HugeiconsIcon
+                icon={ArrowDown01Icon}
+                className="transform rotate-90"
+              />
+              <span>마이페이지</span>
+            </>
+          </LocalizedClientLink>
+        ) : (
+          <>
+            <div className="text-xl-semi mb-4 px-8">
+              {customer?.first_name}님, 안녕하세요.
+            </div>
+            <div className="text-base-regular">
+              <ul>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/profile"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    data-testid="profile-link"
+                  >
+                    <>
+                      <div className="flex items-center gap-x-2">
+                        <HugeiconsIcon icon={UserIcon} size={20} />
+                        <span>회원 정보</span>
+                      </div>
+                      <HugeiconsIcon
+                        icon={ArrowDown01Icon}
+                        className="transform -rotate-90"
+                      />
+                    </>
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/addresses"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    data-testid="addresses-link"
+                  >
+                    <>
+                      <div className="flex items-center gap-x-2">
+                        <HugeiconsIcon icon={Location01Icon} size={20} />
+                        <span>배송지 관리</span>
+                      </div>
+                      <HugeiconsIcon
+                        icon={ArrowDown01Icon}
+                        className="transform -rotate-90"
+                      />
+                    </>
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/orders"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    data-testid="orders-link"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <HugeiconsIcon icon={PackageIcon} size={20} />
+                      <span>주문 내역</span>
+                    </div>
+                    <HugeiconsIcon
+                      icon={ArrowDown01Icon}
+                      className="transform -rotate-90"
+                    />
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
+                    onClick={handleLogout}
+                    data-testid="logout-button"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <HugeiconsIcon icon={Logout01Icon} />
+                      <span>로그아웃</span>
+                    </div>
+                    <HugeiconsIcon
+                      icon={ArrowDown01Icon}
+                      className="transform -rotate-90"
+                    />
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </>
+        )}
+      </div>
+      <div className="hidden small:block" data-testid="account-nav">
+        <div>
+          <div className="pb-4">
+            <h3 className="text-base-semi">마이페이지</h3>
+          </div>
+          <div className="text-base-regular">
+            <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
+              <li>
+                <AccountNavLink
+                  href="/account"
+                  route={route!}
+                  data-testid="overview-link"
+                >
+                  내 계정
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/profile"
+                  route={route!}
+                  data-testid="profile-link"
+                >
+                  회원 정보
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/addresses"
+                  route={route!}
+                  data-testid="addresses-link"
+                >
+                  배송지 관리
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/orders"
+                  route={route!}
+                  data-testid="orders-link"
+                >
+                  주문 내역
+                </AccountNavLink>
+              </li>
+              <li className="text-grey-700">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  data-testid="logout-button"
+                >
+                  로그아웃
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type AccountNavLinkProps = {
+  href: string
+  route: string
+  children: React.ReactNode
+  "data-testid"?: string
+}
+
+const AccountNavLink = ({
+  href,
+  route,
+  children,
+  "data-testid": dataTestId,
+}: AccountNavLinkProps) => {
+  const { countryCode }: { countryCode: string } = useParams()
+
+  const active = route.split(countryCode)[1] === href
+  return (
+    <LocalizedClientLink
+      href={href}
+      className={clx("text-muted-foreground hover:text-foreground", {
+        "text-foreground font-semibold": active,
+      })}
+      data-testid={dataTestId}
+    >
+      {children}
+    </LocalizedClientLink>
+  )
+}
+
+export default AccountNav

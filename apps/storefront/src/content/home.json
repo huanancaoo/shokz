@@ -1,0 +1,543 @@
+{
+  "campaigns": [
+    {
+      "title": "오픈런 프로 2",
+      "href": "/products/openrun-pro2",
+      "desktop": {
+        "image": "http://localhost:9001/static/1794903668342-6a30c6954033f65301.jpg"
+      },
+      "mobile": {
+        "image": "http://localhost:9001/static/1794903668356-abd9e0fce765382202.jpg"
+      },
+      "poster": "http://localhost:9001/static/1794903668342-6a30c6954033f65301.jpg"
+    },
+    {
+      "title": "지창욱 × SHOKZ",
+      "href": "/pages/ambassador",
+      "desktop": {
+        "video": "http://localhost:9001/static/1794903668404-55dbf1a9df725e025f.mp4"
+      },
+      "mobile": {
+        "video": "http://localhost:9001/static/1794903668435-b907274726323b7322.mp4"
+      },
+      "poster": "http://localhost:9001/static/1794903668440-55dbf1a9df725e025f.jpg"
+    },
+    {
+      "title": "오픈핏 프로",
+      "href": "/products/openfit-pro",
+      "desktop": {
+        "image": "http://localhost:9001/static/1794903668449-90db651d0a351740c5.png"
+      },
+      "mobile": {
+        "image": "http://localhost:9001/static/1794903668478-ac46549ad68a1f5a82.png"
+      },
+      "poster": "http://localhost:9001/static/1794903668449-90db651d0a351740c5.png"
+    }
+  ],
+  "lineup": [
+    {
+      "id": "v0",
+      "name": "인기",
+      "cards": [
+        {
+          "handle": "opendots-2",
+          "scene": "http://localhost:9001/static/1794903668490-8e23ef8bb958870ee0.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668497-62f87a734a10550b71.webp",
+          "description": "내 귀에 와닿는 이어폰",
+          "english_name": "OpenDots 2"
+        },
+        {
+          "handle": "openfit-pro",
+          "scene": "http://localhost:9001/static/1794903668504-f6479b7b7032e7a726.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668510-7497aec78ea3d9aef0.webp",
+          "description": "사운드·통화·착용감 모두 갖춘 플래그십 모델",
+          "english_name": "OpenFit Pro"
+        },
+        {
+          "handle": "openrun-pro2",
+          "scene": "http://localhost:9001/static/1794903668523-9e8f60b225d62f835c.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668533-2d36aa0be1689944c1.webp",
+          "description": "러너를 위한 최대 12시간 재생 플래그십 모델",
+          "english_name": "OpenRun Pro 2"
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "name": "스포츠",
+      "cards": [
+        {
+          "handle": "openrun-pro2",
+          "scene": "http://localhost:9001/static/1794903668523-9e8f60b225d62f835c.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668533-2d36aa0be1689944c1.webp",
+          "description": "러너를 위한 최대 12시간 재생 플래그십 모델",
+          "english_name": "OpenRun Pro 2"
+        },
+        {
+          "handle": "openswim-pro",
+          "scene": "http://localhost:9001/static/1794903668542-36f99a5eea2931d7ff.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668557-a0051df0424c956b02.webp",
+          "description": "수중 MP3와 일상 블루투스를 하나로",
+          "english_name": "OpenSwim Pro"
+        },
+        {
+          "handle": "openrun-air-2",
+          "scene": "http://localhost:9001/static/1794903668633-a6739fe20f037ca808.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668675-9fd90ca786fb35bc60.webp",
+          "description": "가벼움과 퍼포먼스를 모두 잡은 스테디셀러",
+          "english_name": "OpenRun Air 2"
+        },
+        {
+          "handle": "openmove",
+          "scene": "http://localhost:9001/static/1794903668694-5baf6c05b09ae3860c.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668709-65fe0725176cbde7d9.webp",
+          "description": "29g 초경량, 골전도 입문 엔트리 모델",
+          "english_name": "OpenMove"
+        }
+      ]
+    },
+    {
+      "id": "60",
+      "name": "라이프스타일",
+      "cards": [
+        {
+          "handle": "opendots-2",
+          "scene": "http://localhost:9001/static/1794903668490-8e23ef8bb958870ee0.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668497-62f87a734a10550b71.webp",
+          "description": "내 귀에 와닿는 이어폰",
+          "english_name": "OpenDots 2"
+        },
+        {
+          "handle": "openfit-pro",
+          "scene": "http://localhost:9001/static/1794903668504-f6479b7b7032e7a726.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668510-7497aec78ea3d9aef0.webp",
+          "description": "사운드·통화·착용감 모두 갖춘 플래그십 모델",
+          "english_name": "OpenFit Pro"
+        },
+        {
+          "handle": "openfit2plus",
+          "scene": "http://localhost:9001/static/1794903668714-48a73b0457c0259ce8.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668719-988099944a74bb86b4.webp",
+          "description": "한층 업그레이드된 사운드의 프리미엄 모델",
+          "english_name": "OpenFit 2+"
+        },
+        {
+          "handle": "opendotsone",
+          "scene": "http://localhost:9001/static/1794903668724-e1e1ff889c6a054adf.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668729-3a09a23169747d9905.webp",
+          "description": "가볍게 끼우는 샥즈 첫 클립형 이어폰",
+          "english_name": "OpenDots ONE"
+        },
+        {
+          "handle": "opendots-air",
+          "scene": "http://localhost:9001/static/1794903668732-983f30753fab691067.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668738-4748d31fc3c60f4226.webp",
+          "description": "감각적인 스타일을 더한 데일리 모델",
+          "english_name": "OpenDots Air"
+        },
+        {
+          "handle": "openfit-air-2",
+          "scene": "http://localhost:9001/static/1794903668813-c0bb620489ab526530.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668832-c73e19eece036ff4d9.webp",
+          "description": "데일리 착용에 최적화된 가성비 모델",
+          "english_name": "OpenFit Air 2"
+        }
+      ]
+    },
+    {
+      "id": "90",
+      "name": "커뮤니케이션",
+      "cards": [
+        {
+          "handle": "opencomm2",
+          "scene": "http://localhost:9001/static/1794903668837-e555dc2fad3cdad806.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668843-47fbffe2330ee84600.webp",
+          "description": "선명한 통화 품질의 일상 업무용 모델",
+          "english_name": "OpenComm 2"
+        },
+        {
+          "handle": "opencomm2uc",
+          "scene": "http://localhost:9001/static/1794903668846-9d72054d67cec071a7.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668851-ff9d1fc596fc050b93.webp",
+          "description": "동글 하나로 어디서나 연결되는 업무용 올인원",
+          "english_name": "OpenComm 2UC"
+        },
+        {
+          "handle": "openmeet",
+          "scene": "http://localhost:9001/static/1794903668855-c1c037bfe22e7f21b3.webp",
+          "mobile_scene": "http://localhost:9001/static/1794903668861-09a7bff7a3b041f66b.webp",
+          "description": "장시간 회의도 편안한 업무용 헤드셋",
+          "english_name": "OpenMeet"
+        }
+      ]
+    }
+  ],
+  "benefits": [
+    {
+      "id": "member",
+      "title": "회원 특별 혜택",
+      "description": "샥즈 회원만을 위한 프리미엄 혜택",
+      "image": "http://localhost:9001/static/1794903668868-a09f08cf498decd988.webp",
+      "href": "/pages/membership"
+    },
+    {
+      "id": "delivery",
+      "title": "빠른 배송",
+      "description": "원하는 제품을 더 빠르게",
+      "image": "http://localhost:9001/static/1794903668875-bb1544d39afbd10973.webp",
+      "href": "/shipping"
+    },
+    {
+      "id": "genuine",
+      "title": "정품 보증",
+      "description": "가품 걱정 없이",
+      "image": "http://localhost:9001/static/1794903668881-4b370b42554b0e6114.webp",
+      "href": "/pages/registration"
+    },
+    {
+      "id": "as",
+      "title": "2년 무상 A/S",
+      "description": "공식 구매 고객만",
+      "image": "http://localhost:9001/static/1794903668896-1d31483d078e46f64b.webp",
+      "href": "/pages/support"
+    },
+    {
+      "id": "tradein",
+      "title": "보상판매",
+      "description": "구형 제품 반납 시 추가 할인",
+      "image": "http://localhost:9001/static/1794903668903-872bef22face750f24.webp",
+      "href": "/pages/warranty"
+    }
+  ],
+  "athletes": [
+    {
+      "id": "0",
+      "name": "지창욱",
+      "image": "http://localhost:9001/static/1794903668910-915e943190123eab67.webp",
+      "avatar": "http://localhost:9001/static/1794903668916-cf460da8ee5231b0fb.webp",
+      "role": "샥즈 브랜드 앰버서더",
+      "group": "ambassador"
+    },
+    {
+      "id": "1",
+      "name": "SEAN",
+      "image": "http://localhost:9001/static/1794903668920-12fb40c47eb7319894.webp",
+      "avatar": "http://localhost:9001/static/1794903668922-1261fd53aac7942114.webp",
+      "role": "샥즈 브랜드 앰버서더",
+      "group": "ambassador"
+    },
+    {
+      "id": "2",
+      "name": "Eliud Kipchoge",
+      "image": "http://localhost:9001/static/1794903668926-2e3130655824d0d196.webp",
+      "avatar": "http://localhost:9001/static/1794903668936-ae6504dd7e623f5321.webp",
+      "role": "샥즈 글로벌 브랜드 앰버서더",
+      "group": "ambassador"
+    },
+    {
+      "id": "3",
+      "name": "홍범석",
+      "image": "http://localhost:9001/static/1794903668947-3e8353c2783f2f1f39.webp",
+      "avatar": "http://localhost:9001/static/1794903668983-376575a0db3254cf5e.webp",
+      "role": "샥즈 애슬리트",
+      "group": "athlete"
+    },
+    {
+      "id": "4",
+      "name": "김지섭",
+      "image": "http://localhost:9001/static/1794903669019-0c0f354db700da5e02.webp",
+      "avatar": "http://localhost:9001/static/1794903669024-9d1cfdfb41ced5693f.webp",
+      "role": "샥즈 애슬리트",
+      "group": "athlete"
+    },
+    {
+      "id": "5",
+      "name": "박한별",
+      "image": "http://localhost:9001/static/1794903669027-2fa658eea5aaef1d29.webp",
+      "avatar": "http://localhost:9001/static/1794903669029-44eb620e3c71f44834.webp",
+      "role": "샥즈 애슬리트",
+      "group": "athlete"
+    },
+    {
+      "id": "6",
+      "name": "전웅태",
+      "image": "http://localhost:9001/static/1794903669032-550afef496c65dc07d.webp",
+      "avatar": "http://localhost:9001/static/1794903669036-72c398d65b09ca2fdb.webp",
+      "role": "샥즈 애슬리트",
+      "group": "athlete"
+    }
+  ],
+  "awards": [
+    "http://localhost:9001/static/1794903669038-2631953b78d1a3685b.webp",
+    "http://localhost:9001/static/1794903669045-1c7fce1cbebdd2b848.webp",
+    "http://localhost:9001/static/1794903669053-fd5224b62927118001.webp",
+    "http://localhost:9001/static/1794903669059-8deda640baead41bd7.webp",
+    "http://localhost:9001/static/1794903669062-dff5d2fd67811e1c42.webp",
+    "http://localhost:9001/static/1794903669067-fcd98bf8bcec79f456.webp",
+    "http://localhost:9001/static/1794903669070-b01f1a106fa384827a.webp",
+    "http://localhost:9001/static/1794903669071-ed6e86baea60651da4.webp",
+    "http://localhost:9001/static/1794903669073-975c0be019e3561757.webp",
+    "http://localhost:9001/static/1794903669076-93e9d68d92b5a2d40b.webp",
+    "http://localhost:9001/static/1794903669078-e69a7e9903365b9055.webp",
+    "http://localhost:9001/static/1794903669080-0094e31f49725caa43.webp"
+  ],
+  "reviews": [
+    {
+      "image": "http://localhost:9001/static/1794903669083-0ae22aa50b72842644.webp",
+      "href": "/products/opendots-2",
+      "quote": "“음악과 함께라면 천천히 조깅 가능! 외롭지 않았다.”",
+      "author": "@runner_zeze"
+    },
+    {
+      "image": "http://localhost:9001/static/1794903669088-5864d276d765dfa44f.webp",
+      "href": "/products/openrun-pro2",
+      "quote": "“ 자전거에 속도계 빼먹은 것처럼 안 챙기면 섭섭한 존재, 샥즈. ”",
+      "author": "@jomeri929"
+    },
+    {
+      "image": "http://localhost:9001/static/1794903669091-b2e6b1c579bb20fb5f.webp",
+      "href": "/products/openfit-pro",
+      "quote": "“ 돈이 전혀 아깝지 않은 선택이 었습니다. ”",
+      "author": "@dols****"
+    },
+    {
+      "image": "http://localhost:9001/static/1794903669093-259fa89c5d8444ef1e.webp",
+      "href": "/products/openswim-pro",
+      "quote": "“ 물안에서 음질 완전 좋고 통화할 때도 손이 편하니까 신세계를 맛보고 있어요. ”",
+      "author": "@solb****"
+    },
+    {
+      "image": "http://localhost:9001/static/1794903669095-6c441e45fd122c2977.webp",
+      "href": "/products/openrun-air-2",
+      "quote": "“ 장시간 착용해도 귀의 부담이 적어 러닝은 물론 일상용으로도 만족도가 높은 제품입니다. ”",
+      "author": "@김균영"
+    }
+  ],
+  "quiz": {
+    "visible": true,
+    "is_mobile": false,
+    "title": "나에게 맞는 제품을\n고민 중이신가요?",
+    "subtitle": "2가지 질문으로 딱 맞는 제품을 찾아드릴게요.",
+    "resultTitle": "고민 끝. 이게 딱입니다.",
+    "resultSub": "선택하신 조건에 가장 정확히 맞는 샥즈를 찾았어요.",
+    "emptyTip": "조건에 맞는 제품을 찾지 못했어요. 다시 시도해 주세요.",
+    "q1": "주로 어떤 상황에서 사용하시나요?",
+    "scenes": [
+      {
+        "id": "run",
+        "title": "운동 / 러닝",
+        "desc": "야외 달리기, 운동 시 안전하게 음악 감상",
+        "image": "http://localhost:9001/static/1794903669098-5a17d9784c6f80f55e.webp",
+        "tone": "run"
+      },
+      {
+        "id": "work",
+        "title": "업무 / 통화",
+        "desc": "재택근무, 화상회의 장시간 통화",
+        "image": "http://localhost:9001/static/1794903669110-52a3f1f61b2f6e7624.webp",
+        "tone": "work"
+      },
+      {
+        "id": "swim",
+        "title": "수영 · 수중 활동",
+        "desc": "수영장에서 음악 들으며 훈련",
+        "image": "http://localhost:9001/static/1794903669122-a432732e4f13ddd62a.webp",
+        "tone": "swim"
+      },
+      {
+        "id": "daily",
+        "title": "데일리 · 일상",
+        "desc": "출퇴근, 가벼운 외출 편안한 착용감",
+        "image": "http://localhost:9001/static/1794903669126-0fd626988897622611.webp",
+        "tone": "daily"
+      }
+    ],
+    "branches": {
+      "run": {
+        "skip": false,
+        "question": "운동할 때 가장 중요한 게 뭔가요?",
+        "options": [
+          {
+            "id": "sound",
+            "label": "더 좋은 음질로 운동하고 싶어요",
+            "products": [
+              "openrun-pro2"
+            ]
+          },
+          {
+            "id": "rain",
+            "label": "땀 · 비에도 걱정 없어야 해요",
+            "products": [
+              "openrun-air-2"
+            ]
+          },
+          {
+            "id": "light",
+            "label": "작고 가볍게 착용하고 싶어요",
+            "products": [
+              "openrun-pro2",
+              "openrun-air-2"
+            ]
+          }
+        ]
+      },
+      "work": {
+        "skip": false,
+        "question": "주로 어디서 통화·회의하시나요?",
+        "options": [
+          {
+            "id": "phone",
+            "label": "스마트폰으로 통화가 많아요",
+            "products": [
+              "opencomm2"
+            ]
+          },
+          {
+            "id": "pc",
+            "label": "PC로 화상회의가 많아요",
+            "products": [
+              "opencomm2uc"
+            ]
+          },
+          {
+            "id": "both",
+            "label": "스마트폰과 PC 모두 써요",
+            "products": [
+              "opencomm2uc",
+              "openmeet"
+            ]
+          }
+        ]
+      },
+      "swim": {
+        "skip": true,
+        "question": "",
+        "products": [
+          "openswim-pro"
+        ],
+        "options": []
+      },
+      "daily": {
+        "skip": false,
+        "question": "일상에서 가장 원하는 게 뭔가요?",
+        "options": [
+          {
+            "id": "focus",
+            "label": "음악을 들을 때 확실하게 몰입하고 싶어요",
+            "products": [
+              "openfit-pro"
+            ]
+          },
+          {
+            "id": "allday",
+            "label": "하루 종일 편하게 착용하고 싶어요",
+            "products": [
+              "openfit2plus",
+              "openfit-air-2"
+            ]
+          },
+          {
+            "id": "natural",
+            "label": "이어폰 낀 티가 안 났으면 좋겠어요",
+            "products": [
+              "opendots-2",
+              "opendots-air"
+            ]
+          }
+        ]
+      }
+    },
+    "products": {
+      "openrun-pro2": {
+        "id": "OpenRunPro2",
+        "name": "오픈런 프로 2",
+        "position": "플래그십",
+        "img": "http://localhost:9001/static/1794901299222-6d39c130001fb90298.webp",
+        "link": "/products/openrun-pro2",
+        "handle": "openrun-pro2"
+      },
+      "openrun-air-2": {
+        "id": "openrun-air-2",
+        "name": "오픈런 에어 2",
+        "position": "스탠다드",
+        "img": "http://localhost:9001/static/1794901300493-af16cc8a64fadb4885.webp",
+        "link": "/products/openrun-air-2",
+        "handle": "openrun-air-2"
+      },
+      "openswim-pro": {
+        "id": "OpenSwimPro",
+        "name": "오픈스윔 프로",
+        "position": "플래그십",
+        "img": "http://localhost:9001/static/1794901300689-ab3771431ae2c571cb.webp",
+        "link": "/products/openswim-pro",
+        "handle": "openswim-pro"
+      },
+      "opencomm2": {
+        "id": "opencomm2",
+        "name": "오픈컴 2",
+        "position": "일상 업무용",
+        "img": "http://localhost:9001/static/1794901302018-179fddd574cb667297.webp",
+        "link": "/products/opencomm2",
+        "handle": "opencomm2"
+      },
+      "opencomm2uc": {
+        "id": "opencomm2uc",
+        "name": "오픈컴 2UC",
+        "position": "다용도 업무용",
+        "img": "http://localhost:9001/static/1794901302435-76ab0dc345a4ba5eb3.webp",
+        "link": "/products/opencomm2uc",
+        "handle": "opencomm2uc"
+      },
+      "openmeet": {
+        "id": "openmeet",
+        "name": "오픈밋",
+        "position": "다용도 업무용",
+        "img": "http://localhost:9001/static/1794901302545-70a7e6ebf7e4e5bad5.webp",
+        "link": "/products/openmeet",
+        "handle": "openmeet"
+      },
+      "openfit-pro": {
+        "id": "openfit-pro",
+        "name": "오픈핏 프로",
+        "position": "플래그십",
+        "img": "http://localhost:9001/static/1794901300195-698b56ede18fa7413f.webp",
+        "link": "/products/openfit-pro",
+        "handle": "openfit-pro"
+      },
+      "openfit2plus": {
+        "id": "openfit2plus",
+        "name": "오픈핏 2+",
+        "position": "프리미엄",
+        "img": "http://localhost:9001/static/1794901300845-52c2309393aa2697e4.webp",
+        "link": "/products/openfit2plus",
+        "handle": "openfit2plus"
+      },
+      "openfit-air-2": {
+        "id": "openfit-air-2",
+        "name": "오픈핏 에어 2",
+        "position": "스탠다드",
+        "img": "http://localhost:9001/static/1794901301146-3fbbf93b6bf9567281.webp",
+        "link": "/products/openfit-air-2",
+        "handle": "openfit-air-2"
+      },
+      "opendots-2": {
+        "id": "opendots-2",
+        "name": "오픈닷 2",
+        "position": "플래그십",
+        "img": "http://localhost:9001/static/1794901299836-35b7d1c2f86d378c8c.webp",
+        "link": "/products/opendots-2",
+        "handle": "opendots-2"
+      },
+      "opendots-air": {
+        "id": "opendots-air",
+        "name": "오픈닷 에어",
+        "position": "스탠다드",
+        "img": "http://localhost:9001/static/1794901301580-b2f7cef096e0249caf.webp",
+        "link": "/products/opendots-air",
+        "handle": "opendots-air"
+      }
+    },
+    "compareBase": "/shop/compare"
+  },
+  "logo": "http://localhost:9001/static/1794903669129-bf4f66a9c289309f43.png"
+}
