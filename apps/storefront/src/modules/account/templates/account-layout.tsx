@@ -14,6 +14,18 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   customer,
   children,
 }) => {
+  // 未登录时没有账户导航，认证页使用独立布局，避免留下空的侧栏网格。
+  if (!customer) {
+    return (
+      <div
+        className="bg-[#f5f4ef] px-5 pb-12 pt-9 md:px-8 xl:px-16 max-[900px]:py-[26px] max-[480px]:bg-white max-[480px]:p-0"
+        data-testid="account-page"
+      >
+        {children}
+      </div>
+    )
+  }
+
   return (
     <div className="flex-1 small:py-12" data-testid="account-page">
       <div className="flex-1 content-container h-full max-w-5xl mx-auto bg-white flex flex-col">

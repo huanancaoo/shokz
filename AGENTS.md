@@ -199,6 +199,9 @@ claude mcp add --transport http medusa-cloud https://cloud.medusajs.com/mcp # or
 
 ## Code Style
 
+- 禁止毛玻璃效果：不得使用 `backdrop-filter`、`backdrop-blur-*` 或其他背景模糊方式制作玻璃面板。使用实色背景、边框和必要的阴影表达层级。
+- 样式优先使用 Tailwind CSS。非必要不新增 CSS；确实无法由现有工具类表达的关键动效等需求，才保留最小范围的自定义 CSS。
+- Storefront 交互控件优先复用 `apps/storefront/src/modules/common/components/ui/` 的 shadcn UI 组件。禁止直接使用浏览器原生输入框、按钮、选择器或弹窗控件拼装界面；需要扩展时通过项目组件封装实现。
 - **The backend must satisfy `@medusajs/eslint-plugin`'s recommended config** (`eslint.config.ts`). Its rules encode Medusa framework requirements — correct route/workflow/module shapes, not just cosmetics — so a lint failure usually means the code is actually wrong, not just badly formatted. Never disable a `@medusajs/*` rule to make lint pass; fix the code.
 - No semicolons. Double quotes, 2-space indent.
 - Files: kebab-case. Types/classes: PascalCase. Functions/variables: camelCase. DB columns: snake_case.

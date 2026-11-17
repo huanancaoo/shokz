@@ -13,7 +13,8 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <head>
         <link rel="ucp" href="/.well-known/ucp" />
       </head>
-      <body>
+      {/* Drawer 的 iOS 遮罩使用绝对定位，需要以 body 作为定位参照。 */}
+      <body className="relative">
         <main className="relative">
           <CompareProvider>{props.children}</CompareProvider>
         </main>

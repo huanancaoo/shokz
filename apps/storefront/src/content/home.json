@@ -9,18 +9,20 @@
       "mobile": {
         "image": "http://localhost:9001/static/1794903668356-abd9e0fce765382202.jpg"
       },
-      "poster": "http://localhost:9001/static/1794903668342-6a30c6954033f65301.jpg"
+      "poster": "http://localhost:9001/static/1794903668342-6a30c6954033f65301.jpg",
+      "english_name": "OPENRUN PRO 2"
     },
     {
       "title": "지창욱 × SHOKZ",
       "href": "/pages/ambassador",
       "desktop": {
-        "video": "http://localhost:9001/static/1794903668404-55dbf1a9df725e025f.mp4"
+        "video": "/media/shokz-tvc-desktop.mp4"
       },
       "mobile": {
-        "video": "http://localhost:9001/static/1794903668435-b907274726323b7322.mp4"
+        "video": "/media/shokz-tvc-mobile.mp4"
       },
-      "poster": "http://localhost:9001/static/1794903668440-55dbf1a9df725e025f.jpg"
+      "poster": "http://localhost:9001/static/1794903668910-915e943190123eab67.webp",
+      "english_name": "THE SHOKZ SQUAD"
     },
     {
       "title": "오픈핏 프로",
@@ -31,7 +33,8 @@
       "mobile": {
         "image": "http://localhost:9001/static/1794903668478-ac46549ad68a1f5a82.png"
       },
-      "poster": "http://localhost:9001/static/1794903668449-90db651d0a351740c5.png"
+      "poster": "http://localhost:9001/static/1794903668449-90db651d0a351740c5.png",
+      "english_name": "OPENFIT PRO"
     }
   ],
   "lineup": [

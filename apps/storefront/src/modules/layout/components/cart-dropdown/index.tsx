@@ -7,16 +7,19 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { ShoppingBag01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons"
 import { retrieveCart } from "@lib/data/cart"
 import { CART_UPDATED_EVENT } from "@lib/util/cart-events"
+import { useIsMobile } from "@lib/hooks/use-is-mobile"
 import { convertToLocale } from "@lib/util/money"
 import { Button, buttonVariants } from "@modules/common/components/ui/button"
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetTrigger,
-} from "@modules/common/components/ui/sheet"
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerFooter,
+} from "@modules/common/components/ui/drawer"
 import {
   Empty,
   EmptyHeader,
@@ -39,6 +42,7 @@ export default function CartDropdown({
 }) {
   const [cart, setCart] = useState(initialCart)
   const [open, setOpen] = useState(false)
+  const isMobile = useIsMobile()
   const pathname = usePathname()
   const totalItems =
     cart?.items?.reduce((total, item) => total + item.quantity, 0) ?? 0
@@ -59,32 +63,48 @@ export default function CartDropdown({
   }, [pathname])
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        render={<Button variant="ghost" size="icon" className="cart-trigger" />}
+    <Drawer
+      open={open}
+      onOpenChange={setOpen}
+      swipeDirection={isMobile ? "down" : "right"}
+      showSwipeHandle={isMobile}
+    >
+      <DrawerTrigger
+        render={<Button variant="ghost" size="icon" className="relative" />}
         aria-label={`장바구니, ${totalItems}개 상품`}
         data-testid="nav-cart-link"
       >
-        <HugeiconsIcon icon={ShoppingBag01Icon} />
-        {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
-      </SheetTrigger>
-      <SheetContent className="cart-sheet" data-testid="nav-cart-dropdown">
-        <SheetHeader>
-          <SheetTitle>
+        <HugeiconsIcon
+          icon={ShoppingBag01Icon}
+          className="size-[22px] min-[1201px]:size-[26px]"
+          strokeWidth={1.7}
+        />
+        {totalItems > 0 && (
+          <span
+            className="absolute right-0 top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-primary px-1 text-[10px] leading-none text-primary-foreground ring-2 ring-background"
+            aria-hidden="true"
+          >
+            {totalItems}
+          </span>
+        )}
+      </DrawerTrigger>
+      <DrawerContent data-testid="nav-cart-dropdown">
+        <DrawerHeader>
+          <DrawerTitle>
             장바구니{" "}
             <span className="text-muted-foreground">({totalItems})</span>
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             새로운 사운드를 만날 준비가 되셨나요?
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         {cart?.items?.length ? (
           <>
-            <div className="cart-sheet-items">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4">
               {cart.items.map((item) => (
                 <article
                   key={item.id}
-                  className="cart-sheet-item"
+                  className="cart-drawer-item"
                   data-testid="cart-item"
                 >
                   <LocalizedClientLink
@@ -117,11 +137,11 @@ export default function CartDropdown({
                 </article>
               ))}
             </div>
-            <div className="cart-sheet-summary">
+            <DrawerFooter>
               <Separator />
               <div className="flex items-center justify-between gap-4">
                 <span>상품 합계</span>
-                <strong data-testid="cart-subtotal">
+                <strong className="text-lg" data-testid="cart-subtotal">
                   {convertToLocale({
                     amount: cart.item_subtotal ?? 0,
                     currency_code: cart.currency_code,
@@ -147,31 +167,41 @@ export default function CartDropdown({
               >
                 주문하기
               </LocalizedClientLink>
-            </div>
+              <DrawerClose render={<Button variant="outline" />}>
+                닫기
+              </DrawerClose>
+            </DrawerFooter>
           </>
         ) : (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <HugeiconsIcon icon={ShoppingBag01Icon} />
-              </EmptyMedia>
-              <EmptyTitle>아직 비어 있는 장바구니</EmptyTitle>
-              <EmptyDescription>
-                당신의 일상에 어울리는 샥즈를 찾아보세요.
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-              <LocalizedClientLink
-                href="/store"
-                onClick={() => setOpen(false)}
-                className={buttonVariants()}
-              >
-                제품 둘러보기
-              </LocalizedClientLink>
-            </EmptyContent>
-          </Empty>
+          <>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <HugeiconsIcon icon={ShoppingBag01Icon} />
+                </EmptyMedia>
+                <EmptyTitle>아직 비어 있는 장바구니</EmptyTitle>
+                <EmptyDescription>
+                  당신의 일상에 어울리는 샥즈를 찾아보세요.
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <LocalizedClientLink
+                  href="/store"
+                  onClick={() => setOpen(false)}
+                  className={buttonVariants()}
+                >
+                  제품 둘러보기
+                </LocalizedClientLink>
+              </EmptyContent>
+            </Empty>
+            <DrawerFooter>
+              <DrawerClose render={<Button variant="outline" />}>
+                닫기
+              </DrawerClose>
+            </DrawerFooter>
+          </>
         )}
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   )
 }
