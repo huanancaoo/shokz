@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# != 2 ]]; then
-  printf '%s\n' 'Usage: bash deploy/fs6688/build.sh OUTPUT_DIR PRODUCTION_WORKSPACE' >&2
+if [[ $# != 3 ]]; then
+  printf '%s\n' 'Usage: bash deploy/fs6688/build.sh OUTPUT_DIR PRODUCTION_WORKSPACE MEDIA_MANIFEST' >&2
   exit 1
 fi
 
 output=$1
 production=$2
+media_manifest=$3
 test ! -e "$output"
 test -f "$production/apps/backend/node_modules/@medusajs/cli/cli.js"
 node -e 'if (process.platform !== "linux" || process.arch !== "x64" || process.version !== "v24.22.3" || !process.report.getReport().header.glibcVersionRuntime) process.exit(1)'
@@ -16,6 +17,9 @@ export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 export SHOKZ_SELF_HOSTED=1
 export NODE_OPTIONS=--max-old-space-size=1536
 export RAYON_NUM_THREADS=1
+
+# Materialize the target's media IDs in the disposable source checkout before bundling content.
+node deploy/fs6688/prepare-storefront-content.mjs "$media_manifest"
 
 corepack pnpm --dir apps/backend run build
 
