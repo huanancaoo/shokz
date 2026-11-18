@@ -86,7 +86,7 @@ const links = [
 const navItemMotion =
   "relative h-12 gap-1.5 px-2.5 text-sm font-medium transition-colors duration-150 ease-out after:absolute after:inset-x-2.5 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-[var(--shokz-orange)] after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-expanded:after:scale-x-100 min-[1440px]:px-3 motion-reduce:transition-none motion-reduce:after:transition-none"
 
-const headerIconClassName = "size-[22px] min-[1201px]:size-[26px]"
+const headerToolIconClassName = "size-5 min-[1201px]:size-[22px]"
 
 const navLinkMotion =
   "group/nav-link rounded-md outline-none transition-[color,background-color] duration-150 ease-out hover:bg-[#f5f3ef] focus-visible:bg-[#f5f3ef] focus-visible:text-[#c64800] motion-reduce:transition-none"
@@ -179,11 +179,11 @@ export default function Nav({
           aria-haspopup="dialog"
           onClick={() => setPanel("menu")}
         >
-          <HugeiconsIcon icon={Menu01Icon} className={headerIconClassName} />
+          <HugeiconsIcon icon={Menu01Icon} className="size-[22px]" />
         </Button>
         <LocalizedClientLink
           href="/"
-          className="relative mr-auto block aspect-[57/23] w-[72px] shrink-0 overflow-hidden rounded-sm transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c64800] md:w-[88px] min-[1201px]:mr-0 min-[1201px]:w-24 motion-reduce:transition-none"
+          className="relative mr-auto block aspect-[57/23] w-14 shrink-0 overflow-hidden rounded-sm transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c64800] md:w-[68px] min-[1201px]:mr-0 min-[1201px]:w-[76px] motion-reduce:transition-none"
           aria-label="Shokz 홈"
         >
           {/* 原图两侧有透明留白；等比放大后只裁掉留白，使可见标识对齐左侧内容。 */}
@@ -191,7 +191,7 @@ export default function Nav({
             src={branding.logo}
             alt="SHOKZ"
             fill
-            sizes="(min-width: 1201px) 159px, (min-width: 768px) 146px, 119px"
+            sizes="(min-width: 1201px) 126px, (min-width: 768px) 113px, 93px"
             preload
             className="scale-[1.65] object-contain invert"
           />
@@ -299,7 +299,7 @@ export default function Nav({
             >
               <HugeiconsIcon
                 icon={GitCompareIcon}
-                className={headerIconClassName}
+                className={headerToolIconClassName}
                 strokeWidth={1.7}
               />
               <span
@@ -320,7 +320,7 @@ export default function Nav({
           >
             <HugeiconsIcon
               icon={Search01Icon}
-              className={headerIconClassName}
+              className={headerToolIconClassName}
               strokeWidth={1.7}
             />
           </Button>
@@ -335,7 +335,7 @@ export default function Nav({
           >
             <HugeiconsIcon
               icon={UserIcon}
-              className={headerIconClassName}
+              className={headerToolIconClassName}
               strokeWidth={1.7}
             />
           </LocalizedClientLink>

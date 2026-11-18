@@ -76,7 +76,7 @@ export default function CartDropdown({
       >
         <HugeiconsIcon
           icon={ShoppingBag01Icon}
-          className="size-[22px] min-[1201px]:size-[26px]"
+          className="size-5 min-[1201px]:size-[22px]"
           strokeWidth={1.7}
         />
         {totalItems > 0 && (
