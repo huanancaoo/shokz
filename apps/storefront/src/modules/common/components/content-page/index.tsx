@@ -1,6 +1,6 @@
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Button } from "@modules/common/components/ui/button"
 import { Input } from "@modules/common/components/ui/input"

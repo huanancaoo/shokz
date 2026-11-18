@@ -9,6 +9,7 @@ checkEnvVariables()
 const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const mediaOrigin = new URL(process.env.MEDUSA_PUBLIC_URL ?? "http://localhost:9001")
+const medusaBackend = new URL(process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9001")
 const selfHosted = process.env.SHOKZ_SELF_HOSTED === "1"
 const defaultCountryCode = (
   process.env.NEXT_PUBLIC_DEFAULT_REGION || "kr"
@@ -21,6 +22,7 @@ const nextConfig = {
   reactStrictMode: true,
   ...(selfHosted ? { output: "standalone", experimental: { cpus: 1 } } : {}),
   outputFileTracingRoot: path.resolve(__dirname, "../.."),
+  env: { NEXT_PUBLIC_MEDUSA_MEDIA_ORIGIN: mediaOrigin.origin },
   async headers() {
     return [
       {
@@ -41,6 +43,11 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
+        {
+          // Resolve optimizer requests through the storefront router and the internal Medusa address.
+          source: "/assets/medusa/:file([^/]+\\.(?:avif|gif|jpe?g|png|webp))",
+          destination: new URL("/static/:file", medusaBackend).href,
+        },
         {
           source: "/:countryCode/products/:handle([^/.]+).md",
           destination: "/:countryCode/products/:handle/markdown",
@@ -64,7 +71,6 @@ const nextConfig = {
   images: {
     qualities: [75, 90],
     unoptimized: false,
-    // 本地媒体由同机的 Medusa 提供，公开部署则从配置的 HTTPS 域名读取。
     dangerouslyAllowLocalIP: mediaOrigin.hostname === "localhost",
     remotePatterns: [
       new URL("/static/**", mediaOrigin),

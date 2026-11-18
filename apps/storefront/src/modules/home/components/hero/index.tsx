@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowLeft01Icon,

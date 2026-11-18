@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import type { HttpTypes } from "@medusajs/types"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowRight01Icon,

@@ -1,5 +1,5 @@
 import articles from "../../../../content/articles.json"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"

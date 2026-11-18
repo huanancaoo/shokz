@@ -1,7 +1,7 @@
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Image01Icon } from "@hugeicons/core-free-icons"
 import { cn as clx } from "@lib/utils"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import React from "react"
 
 type ThumbnailProps = {

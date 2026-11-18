@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import branding from "@/content/branding.json"
 import { useParams, usePathname } from "next/navigation"
 import { useCompare } from "@lib/context/compare-context"

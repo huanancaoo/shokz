@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useId, useState, useSyncExternalStore } from "react"
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons"
 import { cn } from "@lib/utils"

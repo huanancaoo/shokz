@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "@modules/common/components/store-image"
 import branding from "@/content/branding.json"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons"
