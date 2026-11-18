@@ -1,0 +1,27 @@
+[Unit]
+Description=Shokz storefront and Medusa backend
+After=docker.service network-online.target
+Wants=network-online.target
+RequiresMountsFor=/opt/shokz
+
+[Service]
+Type=simple
+User=shokz
+Group=shokz
+WorkingDirectory=/opt/shokz/current
+Environment=NODE_ENV=production
+Environment=PM2_HOME=/opt/shokz/pm2
+Environment=PATH=/opt/shokz/node/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/opt/shokz/config/runtime.env
+ExecStart=/opt/shokz/node/bin/node /www/server/nodejs/v22.15.0/lib/node_modules/pm2/bin/pm2-runtime start /opt/shokz/current/deploy/ecosystem.config.js
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+CPUQuota=125%
+MemoryMax=2G
+MemorySwapMax=0
+LogRateLimitIntervalSec=30s
+LogRateLimitBurst=300
+
+[Install]
+WantedBy=multi-user.target

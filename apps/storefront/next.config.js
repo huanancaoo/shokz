@@ -1,3 +1,4 @@
+const path = require("node:path")
 const checkEnvVariables = require("./check-env-variables")
 
 checkEnvVariables()
@@ -7,12 +8,15 @@ checkEnvVariables()
  */
 const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
+const mediaOrigin = new URL(process.env.MEDUSA_PUBLIC_URL ?? "http://localhost:9001")
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
+  output: process.env.SHOKZ_SELF_HOSTED === "1" ? "standalone" : undefined,
+  outputFileTracingRoot: path.resolve(__dirname, "../.."),
   async headers() {
     return [
       {
@@ -51,13 +55,10 @@ const nextConfig = {
   images: {
     qualities: [75, 90],
     unoptimized: false,
-    // 本地 POC 的商品媒体由另一个端口的 Medusa File Module 提供。
-    dangerouslyAllowLocalIP: true,
+    // 本地媒体由同机的 Medusa 提供，公开部署则从配置的 HTTPS 域名读取。
+    dangerouslyAllowLocalIP: mediaOrigin.hostname === "localhost",
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
+      new URL("/static/**", mediaOrigin),
       {
         protocol: "https",
         hostname: "*.s3.*.amazonaws.com",

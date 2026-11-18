@@ -1,0 +1,8 @@
+poc.sourcle.com {
+	reverse_proxy 127.0.0.1:18082
+}
+
+poc-admin.sourcle.com {
+	redir / /app 302
+	reverse_proxy 127.0.0.1:19001
+}

@@ -9,9 +9,12 @@ const require = createRequire(
   new URL("../apps/storefront/package.json", import.meta.url)
 )
 const Medusa = require("@medusajs/js-sdk").default
+const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+assert.ok(backendUrl, "NEXT_PUBLIC_MEDUSA_BACKEND_URL is required")
+
 const createClient = () =>
   new Medusa({
-    baseUrl: "http://localhost:9001",
+    baseUrl: backendUrl,
     publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
     debug: false,
     auth: { type: "jwt", jwtTokenStorageMethod: "memory" }
@@ -276,7 +279,7 @@ pass("注册客户登录、读取保存地址、下单及查询账户订单")
 
 const report = {
   verified_at: new Date().toISOString(),
-  backend: "http://localhost:9001",
+  backend: backendUrl,
   checks,
   test_order: {
     id: order.id,
