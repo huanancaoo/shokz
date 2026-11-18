@@ -318,12 +318,12 @@ export const addCustomerAddress = async (
 
 export const deleteCustomerAddress = async (
   addressId: string
-): Promise<void> => {
+): Promise<{ success: boolean; error: string | null }> => {
   const headers = {
     ...(await getAuthHeaders()),
   }
 
-  await sdk.store.customer
+  return sdk.store.customer
     .deleteAddress(addressId, headers)
     .then(async () => {
       const customerCacheTag = await getCacheTag("customers")
@@ -358,9 +358,10 @@ export const updateCustomerAddress = async (
     country_code: formData.get("country_code") as string,
   } as HttpTypes.StoreUpdateCustomerAddress
 
-  const phone = formData.get("phone") as string
+  const phone = formData.get("phone") as string | null
 
-  if (phone) {
+  // 空字符串代表用户明确清空电话，未提交该字段才保留原值。
+  if (phone !== null) {
     address.phone = phone
   }
 

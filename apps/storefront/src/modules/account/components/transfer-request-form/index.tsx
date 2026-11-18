@@ -1,100 +1,62 @@
 "use client"
 
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  CancelCircleIcon,
-  CheckmarkCircle02Icon,
-} from "@hugeicons/core-free-icons"
+import { useActionState, useState } from "react"
 import { createTransferRequest } from "@lib/data/orders"
-
-import { Heading, Text } from "@/components/typography"
-import { Button } from "@modules/common/components/ui/button"
-import { Input } from "@modules/common/components/ui/input"
-import { useActionState } from "react"
-// TODO: Re-add Toaster component when needed
 import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { useEffect, useState } from "react"
+import Input from "@modules/common/components/input"
+import { Alert, AlertDescription } from "@modules/common/components/ui/alert"
 
 export default function TransferRequestForm() {
-  const [showSuccess, setShowSuccess] = useState(false)
-
+  const [orderId, setOrderId] = useState("")
   const [state, formAction] = useActionState(createTransferRequest, {
     success: false,
     error: null,
     order: null,
   })
 
-  useEffect(() => {
-    if (state.success && state.order) {
-      setShowSuccess(true)
-    }
-  }, [state.success, state.order])
-
   return (
-    <div className="flex flex-col gap-y-4 w-full">
-      <div className="grid sm:grid-cols-2 items-center gap-x-8 gap-y-4 w-full">
-        <div className="flex flex-col gap-y-1">
-          <Heading
-            level="h3"
-            className="!text-sm font-semibold text-neutral-950"
-          >
-            주문 연결
-          </Heading>
-          <p className="text-small-regular text-neutral-500">
-            찾으시는 주문이 보이지 않나요?
-            <br /> 주문을 계정에 연결하세요.
-          </p>
-        </div>
-        <form
-          action={formAction}
-          className="flex flex-col gap-y-1 sm:items-end"
-        >
-          <div className="flex flex-col gap-y-2 w-full">
-            <Input className="w-full" name="order_id" placeholder="주문 ID" />
-            <SubmitButton
-              variant="outline"
-              size="sm"
-              className="w-fit whitespace-nowrap self-end"
-            >
-              주문 연결 요청
-            </SubmitButton>
-          </div>
-        </form>
+    <section
+      aria-labelledby="order-transfer-title"
+      className="space-y-4 rounded-2xl border bg-background p-4 sm:p-5"
+    >
+      <div>
+        <h2 id="order-transfer-title" className="text-base font-semibold">
+          주문 연결
+        </h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          목록에 없는 주문은 주문 ID로 연결을 요청할 수 있어요.
+        </p>
       </div>
-      {!state.success && state.error && (
-        <Text className="text-base-regular text-rose-500 text-right">
-          {state.error}
-        </Text>
-      )}
-      {showSuccess && (
-        <div className="flex justify-between p-4 bg-neutral-50 shadow-borders-base w-full self-stretch items-center">
-          <div className="flex gap-x-2 items-center">
-            <HugeiconsIcon
-              icon={CheckmarkCircle02Icon}
-              className="w-4 h-4 text-emerald-500"
-            />
-            <div className="flex flex-col gap-y-1">
-              <Text className="text-medim-pl text-neutral-950">
-                주문 {state.order?.id} 연결 요청을 생성했습니다.
-              </Text>
-              <Text className="text-base-regular text-neutral-600">
-                이 POC에는 이메일 발송이 설정되어 있지 않습니다.
-              </Text>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-fit"
-            onClick={() => setShowSuccess(false)}
-          >
-            <HugeiconsIcon
-              icon={CancelCircleIcon}
-              className="w-4 h-4 text-neutral-500"
-            />
-          </Button>
+      <form action={formAction} className="space-y-3">
+        <div className="grid items-end gap-2 sm:max-w-lg sm:grid-cols-[minmax(0,1fr)_auto]">
+          <Input
+            label="주문 ID"
+            name="order_id"
+            value={orderId}
+            onChange={(event) => setOrderId(event.currentTarget.value)}
+            placeholder="order_…"
+            required
+            className="max-md:text-base"
+          />
+          <SubmitButton variant="outline" className="h-[46px] px-4">
+            주문 연결 요청
+          </SubmitButton>
         </div>
-      )}
-    </div>
+        {state.error && (
+          <Alert variant="destructive">
+            <AlertDescription>
+              주문을 연결하지 못했어요. 주문 ID를 확인하고 다시 시도해 주세요.
+            </AlertDescription>
+          </Alert>
+        )}
+        {state.success && (
+          <Alert role="status" className="border-emerald-200 bg-emerald-50">
+            <AlertDescription className="text-emerald-900">
+              주문 연결 요청을 접수했습니다.
+            </AlertDescription>
+          </Alert>
+        )}
+      </form>
+    </section>
   )
 }

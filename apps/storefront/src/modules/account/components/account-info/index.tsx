@@ -1,84 +1,126 @@
 "use client"
 
-import { useEffect } from "react"
-import { useFormStatus } from "react-dom"
-import useToggleState from "@lib/hooks/use-toggle-state"
+import { Edit02Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { useEffect, useId, useRef, useState, useTransition } from "react"
+import type { FormEvent, ReactNode } from "react"
+import { Alert, AlertDescription } from "@modules/common/components/ui/alert"
 import { Button } from "@modules/common/components/ui/button"
 import { Spinner } from "@modules/common/components/ui/spinner"
-import { Alert, AlertDescription } from "@modules/common/components/ui/alert"
-import { FieldGroup } from "@modules/common/components/ui/field"
 
 type AccountInfoProps = {
   label: string
-  currentInfo: string | React.ReactNode
-  isSuccess?: boolean
-  isError?: boolean
-  errorMessage?: string
-  clearState: () => void
-  children?: React.ReactNode
+  currentInfo: ReactNode
+  onSave?: (data: FormData) => Promise<boolean>
+  children?: ReactNode
   "data-testid"?: string
 }
 
 export default function AccountInfo({
   label,
   currentInfo,
-  isSuccess,
-  isError,
-  clearState,
-  errorMessage = "저장하지 못했습니다. 다시 시도해 주세요.",
+  onSave,
   children,
   "data-testid": testId,
 }: AccountInfoProps) {
-  const { state, close, toggle } = useToggleState()
-  const { pending } = useFormStatus()
+  const [editing, setEditing] = useState(false)
+  const [feedback, setFeedback] = useState<"saved" | "error" | null>(null)
+  const [pending, startTransition] = useTransition()
+  const formId = useId()
+  const editButton = useRef<HTMLButtonElement>(null)
+
   useEffect(() => {
-    if (isSuccess) close()
-  }, [isSuccess, close])
+    if (feedback === "saved" && !pending) editButton.current?.focus()
+  }, [feedback, pending])
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!onSave) return
+
+    const data = new FormData(event.currentTarget)
+
+    startTransition(async () => {
+      try {
+        const saved = await onSave(data)
+        setFeedback(saved ? "saved" : "error")
+        if (saved) setEditing(false)
+      } catch {
+        setFeedback("error")
+      }
+    })
+  }
+
   return (
-    <section className="account-info-section" data-testid={testId}>
-      <div className="flex items-center justify-between gap-6">
-        <div>
-          <p className="text-xs text-muted-foreground mb-2">{label}</p>
-          <div className="font-medium" data-testid="current-info">
+    <div className="py-4 sm:py-5" data-testid={testId}>
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0 space-y-1">
+          <p className="text-[13px] leading-5 text-muted-foreground">{label}</p>
+          <div
+            className="text-sm font-medium leading-6 [overflow-wrap:anywhere] sm:text-base sm:leading-6"
+            data-testid="current-info"
+          >
             {currentInfo}
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          type="button"
-          onClick={() => {
-            clearState()
-            toggle()
-          }}
-          data-testid="edit-button"
-          data-active={state}
-        >
-          {state ? "취소" : "수정"}
-        </Button>
-      </div>
-      {isSuccess && (
-        <Alert className="mt-4" data-testid="success-message">
-          <AlertDescription>{label} 정보를 저장했습니다.</AlertDescription>
-        </Alert>
-      )}
-      {isError && (
-        <Alert
-          variant="destructive"
-          className="mt-4"
-          data-testid="error-message"
-        >
-          <AlertDescription>{errorMessage}</AlertDescription>
-        </Alert>
-      )}
-      {state && (
-        <FieldGroup className="mt-6">
-          {children}
-          <Button disabled={pending} type="submit" data-testid="save-button">
-            {pending && <Spinner data-icon="inline-start" />}변경사항 저장
+        {onSave && (
+          <Button
+            ref={editButton}
+            variant="outline"
+            type="button"
+            className="h-10 gap-1.5 px-3"
+            aria-label={editing ? `${label} 수정 취소` : `${label} 수정`}
+            aria-expanded={editing}
+            aria-controls={editing ? formId : undefined}
+            disabled={pending}
+            onClick={() => {
+              setFeedback(null)
+              setEditing(!editing)
+            }}
+            data-testid="edit-button"
+            data-active={editing}
+          >
+            {!editing && <HugeiconsIcon icon={Edit02Icon} aria-hidden />}
+            {editing ? "취소" : "수정"}
           </Button>
-        </FieldGroup>
+        )}
+      </div>
+      {editing && (
+        <form
+          id={formId}
+          onSubmit={submit}
+          aria-busy={pending}
+          className="mt-4 space-y-4 rounded-xl border bg-muted/40 p-4 max-md:[&_input]:text-base max-md:[&_select]:text-base"
+        >
+          <fieldset className="min-w-0" disabled={pending}>
+            {children}
+          </fieldset>
+          {feedback === "error" && (
+            <Alert variant="destructive" data-testid="error-message">
+              <AlertDescription>
+                저장하지 못했습니다. 다시 시도해 주세요.
+              </AlertDescription>
+            </Alert>
+          )}
+          <Button
+            className="h-11 px-4"
+            disabled={pending}
+            type="submit"
+            data-testid="save-button"
+          >
+            {pending && <Spinner data-icon="inline-start" />}
+            {pending ? "저장 중" : "변경사항 저장"}
+          </Button>
+        </form>
       )}
-    </section>
+      <p
+        role="status"
+        className={
+          feedback === "saved" ? "mt-2 text-sm text-emerald-800" : "sr-only"
+        }
+        data-testid={feedback === "saved" ? "success-message" : undefined}
+      >
+        {feedback === "saved" ? "변경사항을 저장했습니다." : ""}
+      </p>
+    </div>
   )
 }

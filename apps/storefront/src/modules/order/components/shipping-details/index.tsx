@@ -14,11 +14,8 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
       <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
         배송 방법
       </Heading>
-      <div className="flex items-start gap-x-8">
-        <div
-          className="flex flex-col w-1/3"
-          data-testid="shipping-address-summary"
-        >
+      <div className="grid gap-4 [overflow-wrap:anywhere] sm:grid-cols-3 sm:gap-6">
+        <div className="min-w-0" data-testid="shipping-address-summary">
           <Text className="text-sm font-medium text-foreground mb-1">
             배송지
           </Text>
@@ -39,10 +36,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
           </Text>
         </div>
 
-        <div
-          className="flex flex-col w-1/3 "
-          data-testid="shipping-contact-summary"
-        >
+        <div className="min-w-0" data-testid="shipping-contact-summary">
           <Text className="text-sm font-medium text-foreground mb-1">
             연락처
           </Text>
@@ -52,10 +46,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
           <Text className="text-sm text-muted-foreground">{order.email}</Text>
         </div>
 
-        <div
-          className="flex flex-col w-1/3"
-          data-testid="shipping-method-summary"
-        >
+        <div className="min-w-0" data-testid="shipping-method-summary">
           <Text className="text-sm font-medium text-foreground mb-1">
             배송 방법
           </Text>

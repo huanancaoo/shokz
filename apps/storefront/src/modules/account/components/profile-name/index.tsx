@@ -1,79 +1,52 @@
 "use client"
 
-import React, { useEffect, useActionState } from "react"
-
-import Input from "@modules/common/components/input"
-
-import AccountInfo from "../account-info"
-import { HttpTypes } from "@medusajs/types"
+import type { HttpTypes } from "@medusajs/types"
 import { updateCustomer } from "@lib/data/customer"
+import Input from "@modules/common/components/input"
+import AccountInfo from "../account-info"
 
-type MyInformationProps = {
+export default function ProfileName({
+  customer,
+}: {
   customer: HttpTypes.StoreCustomer
-}
+}) {
+  const name = [customer.last_name, customer.first_name]
+    .filter(Boolean)
+    .join(" ")
 
-const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
-  const [successState, setSuccessState] = React.useState(false)
-
-  const updateCustomerName = async (
-    _currentState: Record<string, unknown>,
-    formData: FormData
-  ) => {
-    const customer = {
-      first_name: formData.get("first_name") as string,
-      last_name: formData.get("last_name") as string,
-    }
-
-    try {
-      await updateCustomer(customer)
-      return { success: true, error: null }
-    } catch (error) {
-      return { success: false, error: String(error) }
-    }
+  async function saveName(data: FormData) {
+    await updateCustomer({
+      first_name: data.get("first_name") as string,
+      last_name: data.get("last_name") as string,
+    })
+    return true
   }
-
-  const [state, formAction] = useActionState(updateCustomerName, {
-    error: null as string | null,
-    success: false,
-  })
-
-  const clearState = () => {
-    setSuccessState(false)
-  }
-
-  useEffect(() => {
-    setSuccessState(state.success)
-  }, [state])
 
   return (
-    <form action={formAction} className="w-full overflow-visible">
-      <AccountInfo
-        label="이름"
-        currentInfo={`${customer.first_name} ${customer.last_name}`}
-        isSuccess={successState}
-        isError={!!state?.error}
-        clearState={clearState}
-        data-testid="account-name-editor"
-      >
-        <div className="grid grid-cols-2 gap-x-4">
-          <Input
-            label="이름"
-            name="first_name"
-            required
-            defaultValue={customer.first_name ?? ""}
-            data-testid="first-name-input"
-          />
-          <Input
-            label="성"
-            name="last_name"
-            required
-            defaultValue={customer.last_name ?? ""}
-            data-testid="last-name-input"
-          />
-        </div>
-      </AccountInfo>
-    </form>
+    <AccountInfo
+      label="이름"
+      currentInfo={name || "등록된 이름이 없어요"}
+      onSave={saveName}
+      data-testid="account-name-editor"
+    >
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          label="성"
+          name="last_name"
+          autoComplete="family-name"
+          required
+          defaultValue={customer.last_name ?? ""}
+          data-testid="last-name-input"
+        />
+        <Input
+          label="이름"
+          name="first_name"
+          autoComplete="given-name"
+          required
+          defaultValue={customer.first_name ?? ""}
+          data-testid="first-name-input"
+        />
+      </div>
+    </AccountInfo>
   )
 }
-
-export default ProfileName

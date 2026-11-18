@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
-import ProfilePhone from "@modules/account//components/profile-phone"
+import AccountPageHeader from "@modules/account/components/account-page-header"
+import ProfilePhone from "@modules/account/components/profile-phone"
 import ProfileBillingAddress from "@modules/account/components/profile-billing-address"
 import ProfileEmail from "@modules/account/components/profile-email"
 import ProfileName from "@modules/account/components/profile-name"
@@ -14,34 +15,43 @@ export const metadata: Metadata = {
 }
 
 export default async function Profile() {
-  const customer = await retrieveCustomer()
-  const regions = await listRegions()
+  const [customer, regions] = await Promise.all([
+    retrieveCustomer(),
+    listRegions(),
+  ])
 
   if (!customer || !regions) {
     notFound()
   }
 
   return (
-    <div className="w-full" data-testid="profile-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">회원 정보</h1>
-        <p className="text-base-regular">
-          이름, 이메일, 전화번호와 청구지 주소를 확인하고 수정하세요.
-        </p>
-      </div>
-      <div className="flex flex-col gap-y-8 w-full">
-        <ProfileName customer={customer} />
-        <Divider />
-        <ProfileEmail customer={customer} />
-        <Divider />
-        <ProfilePhone customer={customer} />
-        <Divider />
+    <div className="space-y-5" data-testid="profile-page-wrapper">
+      <AccountPageHeader
+        title="회원 정보"
+        description="연락처와 청구지 주소를 관리할 수 있어요."
+      />
+      <section
+        className="rounded-2xl border bg-background px-4 sm:px-6"
+        aria-labelledby="profile-contact-title"
+      >
+        <h2
+          id="profile-contact-title"
+          className="pt-5 text-base font-semibold sm:pt-6"
+        >
+          기본 정보
+        </h2>
+        <div className="divide-y">
+          <ProfileName customer={customer} />
+          <ProfileEmail customer={customer} />
+          <ProfilePhone customer={customer} />
+        </div>
+      </section>
+      <section
+        className="rounded-2xl border bg-background px-4 sm:px-6"
+        aria-label="청구지"
+      >
         <ProfileBillingAddress customer={customer} regions={regions} />
-      </div>
+      </section>
     </div>
   )
-}
-
-const Divider = () => {
-  return <div className="w-full h-px bg-gray-200" />
 }

@@ -27,21 +27,23 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   }
 
   return (
-    <div className="flex-1 small:py-12" data-testid="account-page">
-      <div className="flex-1 content-container h-full max-w-5xl mx-auto bg-white flex flex-col">
-        <div className="grid grid-cols-1  small:grid-cols-[240px_1fr] py-12">
-          <div>{customer && <AccountNav customer={customer} />}</div>
-          <div className="flex-1">{children}</div>
-        </div>
-        <div className="flex flex-col small:flex-row items-end justify-between small:border-t border-gray-200 py-12 gap-8">
-          <div>
-            <h3 className="text-xl-semi mb-4">궁금한 점이 있으신가요?</h3>
-            <span className="text-sm">
-              고객지원에서 자주 묻는 질문과 서비스 안내를 확인하세요.
-            </span>
-          </div>
-          <div>
-            <UnderlineLink href="/pages/support">고객지원</UnderlineLink>
+    <div className="flex-1 bg-muted/60" data-testid="account-page">
+      <div className="mx-auto max-w-[1248px] px-4 pb-12 pt-5 sm:px-8 sm:pt-10 lg:px-10 lg:pb-16">
+        <div className="grid items-start gap-6 small:grid-cols-[216px_minmax(0,1fr)] small:gap-10">
+          <AccountNav />
+          <div className="min-w-0 space-y-8">
+            {children}
+            <section className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t pt-5">
+              <div className="space-y-1">
+                <h2 className="text-sm font-semibold">
+                  궁금한 점이 있으신가요?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  자주 묻는 질문과 서비스 안내를 확인하세요.
+                </p>
+              </div>
+              <UnderlineLink href="/pages/support">고객지원</UnderlineLink>
+            </section>
           </div>
         </div>
       </div>

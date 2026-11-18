@@ -1,9 +1,8 @@
-"use client"
-
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Cancel01Icon } from "@hugeicons/core-free-icons"
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons"
 
 import { HttpTypes } from "@medusajs/types"
+import AccountPageHeader from "@modules/account/components/account-page-header"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
@@ -20,19 +19,20 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
   order,
 }) => {
   return (
-    <div className="flex flex-col justify-center gap-y-4">
-      <div className="flex gap-2 justify-between items-center">
-        <h1 className="text-2xl-semi">주문 상세</h1>
+    <div className="space-y-5">
+      <div>
         <LocalizedClientLink
           href="/account/orders"
-          className="flex gap-2 items-center text-muted-foreground hover:text-foreground"
+          className="mb-1 inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:underline"
           data-testid="back-to-overview-button"
         >
-          <HugeiconsIcon icon={Cancel01Icon} /> 내 계정으로 돌아가기
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={17} aria-hidden />
+          주문 내역으로
         </LocalizedClientLink>
+        <AccountPageHeader title="주문 상세" />
       </div>
       <div
-        className="flex flex-col gap-4 h-full bg-white w-full"
+        className="space-y-5 rounded-2xl border bg-background p-4 [overflow-wrap:anywhere] sm:p-6"
         data-testid="order-details-container"
       >
         <OrderDetails order={order} showStatus />

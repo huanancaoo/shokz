@@ -6,17 +6,16 @@ import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 
 export const metadata: Metadata = {
-  title: "Account",
-  description: "Overview of your account activity.",
+  title: "내 계정 | SHOKZ Korea",
+  description: "회원 정보, 배송지와 최근 주문을 확인하세요.",
 }
 
 export default async function OverviewTemplate() {
-  const customer = await retrieveCustomer().catch(() => null)
-  const orders = (await listOrders().catch(() => null)) || null
-
+  const customer = await retrieveCustomer()
   if (!customer) {
     notFound()
   }
 
+  const orders = await listOrders().catch(() => null)
   return <Overview customer={customer} orders={orders} />
 }

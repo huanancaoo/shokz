@@ -1,48 +1,66 @@
-"use client"
-
-import { buttonVariants } from "@modules/common/components/ui/button"
-
-import OrderCard from "../order-card"
+import { PackageIcon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
+import type { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { HttpTypes } from "@medusajs/types"
+import { buttonVariants } from "@modules/common/components/ui/button"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@modules/common/components/ui/empty"
+import OrderCard from "../order-card"
 
-const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
-  if (orders?.length) {
+export default function OrderOverview({
+  orders,
+}: {
+  orders: HttpTypes.StoreOrder[]
+}) {
+  if (orders.length > 0) {
     return (
-      <div className="flex flex-col gap-y-8 w-full">
-        {orders.map((o) => (
-          <div
-            key={o.id}
-            className="border-b border-gray-200 pb-6 last:pb-0 last:border-none"
-          >
-            <OrderCard order={o} />
-          </div>
+      <ul className="space-y-4">
+        {orders.map((order) => (
+          <li key={order.id}>
+            <OrderCard order={order} />
+          </li>
         ))}
-      </div>
+      </ul>
     )
   }
 
   return (
-    <div
-      className="w-full flex flex-col items-center gap-y-4"
+    <Empty
+      className="min-h-56 border border-solid bg-background"
       data-testid="no-orders-container"
     >
-      <h2 className="text-large-semi">아직 주문 내역이 없습니다</h2>
-      <p className="text-base-regular">
-        당신의 일상에 어울리는 샥즈를 찾아보세요.
-      </p>
-      <div className="mt-4">
+      <EmptyHeader>
+        <EmptyMedia
+          variant="icon"
+          className="size-11 rounded-full bg-accent text-accent-foreground [&_svg]:size-5"
+        >
+          <HugeiconsIcon icon={PackageIcon} aria-hidden />
+        </EmptyMedia>
+        <EmptyTitle>
+          <h2 className="text-base font-semibold">아직 주문 내역이 없어요</h2>
+        </EmptyTitle>
+        <EmptyDescription>
+          주문하시면 이곳에서 배송 상태를 확인할 수 있어요.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
         <LocalizedClientLink
           href="/"
-          passHref
-          className={buttonVariants({ variant: "default" })}
+          className={buttonVariants({
+            variant: "outline",
+            className: "h-11 px-4",
+          })}
           data-testid="continue-shopping-button"
         >
           쇼핑 계속하기
         </LocalizedClientLink>
-      </div>
-    </div>
+      </EmptyContent>
+    </Empty>
   )
 }
-
-export default OrderOverview

@@ -25,6 +25,8 @@ const fulfillmentLabels: Record<string, string> = {
 }
 export const paymentStatusLabel = (status: string) =>
   paymentLabels[status] ?? status
+export const fulfillmentStatusLabel = (status: string) =>
+  fulfillmentLabels[status] ?? status
 
 export default function OrderDetails({
   order,
@@ -51,8 +53,7 @@ export default function OrderDetails({
       {showStatus && (
         <div className="flex flex-wrap gap-3 mt-5">
           <Badge variant="secondary" data-testid="order-status">
-            {fulfillmentLabels[order.fulfillment_status] ??
-              order.fulfillment_status}
+            {fulfillmentStatusLabel(order.fulfillment_status)}
           </Badge>
           <Badge variant="secondary" data-testid="order-payment-status">
             {paymentStatusLabel(order.payment_status)}

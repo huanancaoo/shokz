@@ -1,194 +1,178 @@
 "use client"
 
-import React, { useActionState, useEffect, useMemo } from "react"
-
+import { useId } from "react"
+import type { HttpTypes } from "@medusajs/types"
+import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
 import Input from "@modules/common/components/input"
+import { Field, FieldLabel } from "@modules/common/components/ui/field"
 import {
   NativeSelect,
   NativeSelectOption,
 } from "@modules/common/components/ui/native-select"
-
-import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
-import { HttpTypes } from "@medusajs/types"
 import AccountInfo from "../account-info"
 
-type MyInformationProps = {
-  customer: HttpTypes.StoreCustomer
-  regions: HttpTypes.StoreRegion[]
-}
-
-const ProfileBillingAddress: React.FC<MyInformationProps> = ({
+export default function ProfileBillingAddress({
   customer,
   regions,
-}) => {
-  const regionOptions = useMemo(() => {
-    return (
-      regions
-        ?.map((region) => {
-          return region.countries?.map((country) => ({
-            value: country.iso_2,
-            label: country.display_name,
-          }))
-        })
-        .flat() || []
-    )
-  }, [regions])
-
-  const [successState, setSuccessState] = React.useState(false)
-
-  const billingAddress = customer.addresses?.find(
-    (addr) => addr.is_default_billing
+}: {
+  customer: HttpTypes.StoreCustomer
+  regions: HttpTypes.StoreRegion[]
+}) {
+  const countryId = useId()
+  const billing = customer.addresses?.find(
+    (address) => address.is_default_billing
   )
+  const countries = regions.flatMap((region) => region.countries ?? [])
+  const countryLabel = (country: HttpTypes.StoreRegionCountry) =>
+    country.iso_2 === "kr" ? "대한민국" : country.display_name
+  const country = countries.find(({ iso_2 }) => iso_2 === billing?.country_code)
 
-  const initialState: Record<string, unknown> = {
-    isDefaultBilling: true,
-    isDefaultShipping: false,
-    error: false,
-    success: false,
+  async function saveBillingAddress(data: FormData) {
+    const result = billing
+      ? await updateCustomerAddress({ addressId: billing.id }, data)
+      : await addCustomerAddress(
+          { isDefaultBilling: true, isDefaultShipping: false },
+          data
+        )
+    return result.success
   }
-
-  if (billingAddress) {
-    initialState.addressId = billingAddress.id
-  }
-
-  const [state, formAction] = useActionState(
-    billingAddress ? updateCustomerAddress : addCustomerAddress,
-    initialState
-  )
-
-  const clearState = () => {
-    setSuccessState(false)
-  }
-
-  useEffect(() => {
-    setSuccessState(!!state.success)
-  }, [state])
-
-  const currentInfo = useMemo(() => {
-    if (!billingAddress) {
-      return "No billing address"
-    }
-
-    const country =
-      regionOptions?.find(
-        (country) => country?.value === billingAddress.country_code
-      )?.label || billingAddress.country_code?.toUpperCase()
-
-    return (
-      <div className="flex flex-col font-semibold" data-testid="current-info">
-        <span>
-          {billingAddress.first_name} {billingAddress.last_name}
-        </span>
-        <span>{billingAddress.company}</span>
-        <span>
-          {billingAddress.address_1}
-          {billingAddress.address_2 ? `, ${billingAddress.address_2}` : ""}
-        </span>
-        <span>
-          {billingAddress.postal_code}, {billingAddress.city}
-        </span>
-        <span>{country}</span>
-      </div>
-    )
-  }, [billingAddress, regionOptions])
 
   return (
-    <form action={formAction} onReset={() => clearState()} className="w-full">
-      <input type="hidden" name="addressId" value={billingAddress?.id} />
-      <AccountInfo
-        label="청구지"
-        currentInfo={currentInfo}
-        isSuccess={successState}
-        isError={!!state.error}
-        clearState={clearState}
-        data-testid="account-billing-address-editor"
-      >
-        <div className="grid grid-cols-1 gap-y-2">
-          <div className="grid grid-cols-2 gap-x-2">
-            <Input
-              label="이름"
-              name="first_name"
-              defaultValue={billingAddress?.first_name || undefined}
-              required
-              data-testid="billing-first-name-input"
-            />
-            <Input
-              label="성"
-              name="last_name"
-              defaultValue={billingAddress?.last_name || undefined}
-              required
-              data-testid="billing-last-name-input"
-            />
+    <AccountInfo
+      label="청구지 주소"
+      currentInfo={
+        billing ? (
+          <div>
+            <p>
+              {[billing.last_name, billing.first_name, billing.company]
+                .filter(Boolean)
+                .join(" ")}
+            </p>
+            <p>
+              {[
+                billing.province,
+                billing.city,
+                billing.address_1,
+                billing.address_2,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            </p>
+            <p className="text-sm font-normal text-muted-foreground">
+              {[
+                billing.postal_code,
+                country
+                  ? countryLabel(country)
+                  : billing.country_code?.toUpperCase(),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
           </div>
-          <Input
-            label="회사명 (선택)"
-            name="company"
-            defaultValue={billingAddress?.company || undefined}
-            data-testid="billing-company-input"
-          />
-          <Input
-            label="전화번호"
-            name="phone"
-            type="phone"
-            autoComplete="phone"
-            required
-            defaultValue={billingAddress?.phone ?? customer?.phone ?? ""}
-            data-testid="billing-phone-input"
-          />
-          <Input
-            label="주소"
-            name="address_1"
-            defaultValue={billingAddress?.address_1 || undefined}
-            required
-            data-testid="billing-address-1-input"
-          />
-          <Input
-            label="상세 주소"
-            name="address_2"
-            defaultValue={billingAddress?.address_2 || undefined}
-            data-testid="billing-address-2-input"
-          />
-          <div className="grid grid-cols-[144px_1fr] gap-x-2">
-            <Input
-              label="우편번호"
-              name="postal_code"
-              defaultValue={billingAddress?.postal_code || undefined}
-              required
-              data-testid="billing-postcal-code-input"
-            />
-            <Input
-              label="시 / 군 / 구"
-              name="city"
-              defaultValue={billingAddress?.city || undefined}
-              required
-              data-testid="billing-city-input"
-            />
-          </div>
-          <Input
-            label="도 / 광역시"
-            name="province"
-            defaultValue={billingAddress?.province || undefined}
-            data-testid="billing-province-input"
-          />
+        ) : (
+          "등록된 청구지가 없어요"
+        )
+      }
+      onSave={saveBillingAddress}
+      data-testid="account-billing-address-editor"
+    >
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          label="성"
+          name="last_name"
+          autoComplete="billing family-name"
+          defaultValue={billing?.last_name ?? ""}
+          required
+          data-testid="billing-last-name-input"
+        />
+        <Input
+          label="이름"
+          name="first_name"
+          autoComplete="billing given-name"
+          defaultValue={billing?.first_name ?? ""}
+          required
+          data-testid="billing-first-name-input"
+        />
+        <Input
+          label="전화번호"
+          name="phone"
+          type="tel"
+          autoComplete="billing tel"
+          defaultValue={billing?.phone ?? customer.phone ?? ""}
+          required
+          data-testid="billing-phone-input"
+        />
+        <Input
+          label="회사명 (선택)"
+          name="company"
+          autoComplete="billing organization"
+          defaultValue={billing?.company ?? ""}
+          data-testid="billing-company-input"
+        />
+        <Field>
+          <FieldLabel htmlFor={countryId}>
+            국가 / 지역 <span aria-hidden="true">*</span>
+          </FieldLabel>
           <NativeSelect
+            id={countryId}
+            className="w-full min-w-0"
             name="country_code"
-            defaultValue={billingAddress?.country_code || undefined}
+            autoComplete="billing country"
+            defaultValue={billing?.country_code ?? ""}
             required
             data-testid="billing-country-code-select"
           >
-            <NativeSelectOption value="">-</NativeSelectOption>
-            {regionOptions.map((option, i) => {
-              return (
-                <NativeSelectOption key={i} value={option?.value}>
-                  {option?.label}
-                </NativeSelectOption>
-              )
-            })}
+            <NativeSelectOption value="">국가 선택</NativeSelectOption>
+            {countries.map((option) => (
+              <NativeSelectOption key={option.iso_2} value={option.iso_2}>
+                {countryLabel(option)}
+              </NativeSelectOption>
+            ))}
           </NativeSelect>
+        </Field>
+        <Input
+          label="우편번호"
+          name="postal_code"
+          autoComplete="billing postal-code"
+          defaultValue={billing?.postal_code ?? ""}
+          required
+          data-testid="billing-postcal-code-input"
+        />
+        <Input
+          label="시 / 도 (선택)"
+          name="province"
+          autoComplete="billing address-level1"
+          defaultValue={billing?.province ?? ""}
+          data-testid="billing-province-input"
+        />
+        <Input
+          label="시 / 군 / 구"
+          name="city"
+          autoComplete="billing address-level2"
+          defaultValue={billing?.city ?? ""}
+          required
+          data-testid="billing-city-input"
+        />
+        <div className="col-span-2">
+          <Input
+            label="기본 주소"
+            name="address_1"
+            autoComplete="billing address-line1"
+            defaultValue={billing?.address_1 ?? ""}
+            required
+            data-testid="billing-address-1-input"
+          />
         </div>
-      </AccountInfo>
-    </form>
+        <div className="col-span-2">
+          <Input
+            label="상세 주소 (선택)"
+            name="address_2"
+            autoComplete="billing address-line2"
+            defaultValue={billing?.address_2 ?? ""}
+            data-testid="billing-address-2-input"
+          />
+        </div>
+      </div>
+    </AccountInfo>
   )
 }
-
-export default ProfileBillingAddress
