@@ -11,10 +11,7 @@ import {
 } from "@hugeicons/core-free-icons"
 import { Checkbox } from "@modules/common/components/ui/checkbox"
 import { Field, FieldLabel } from "@modules/common/components/ui/field"
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@modules/common/components/ui/native-select"
+import { SelectControl } from "@modules/common/components/ui/select-control"
 import { Button, buttonVariants } from "@modules/common/components/ui/button"
 import {
   Table,
@@ -123,28 +120,23 @@ export default function ComparePage({
                       >
                         <HugeiconsIcon icon={Cancel01Icon} />
                       </Button>
-                      <NativeSelect
+                      <SelectControl
                         value={product.handle!}
-                        onChange={(event) =>
-                          changeProduct(index, event.target.value)
-                        }
+                        onValueChange={(value) => {
+                          if (value) changeProduct(index, value)
+                        }}
                         aria-label={String(index + 1) + "번 비교 제품"}
-                      >
-                        {comparable
+                        items={comparable
                           .filter(
                             (item) =>
                               !handles.includes(item.handle!) ||
                               item.id === product.id
                           )
-                          .map((item) => (
-                            <NativeSelectOption
-                              key={item.id}
-                              value={item.handle!}
-                            >
-                              {item.title}
-                            </NativeSelectOption>
-                          ))}
-                      </NativeSelect>
+                          .map((item) => ({
+                            value: item.handle!,
+                            label: item.title,
+                          }))}
+                      />
                       {product.thumbnail && (
                         <Image
                           src={product.thumbnail}

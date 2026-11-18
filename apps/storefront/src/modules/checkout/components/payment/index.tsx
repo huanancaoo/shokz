@@ -1,122 +1,105 @@
 "use client"
 
-import { useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import type { HttpTypes } from "@medusajs/types"
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { initiatePaymentSession } from "@lib/data/cart"
+import type { HttpTypes } from "@medusajs/types"
+import { CheckoutChoice } from "@modules/checkout/components/checkout-choice"
+import { CheckoutStep } from "@modules/checkout/components/checkout-step"
+import ErrorMessage from "@modules/checkout/components/error-message"
 import { Button } from "@modules/common/components/ui/button"
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@modules/common/components/ui/radio-group"
-import {
-  Field,
-  FieldLabel,
-  FieldDescription,
-} from "@modules/common/components/ui/field"
-import { Alert, AlertDescription } from "@modules/common/components/ui/alert"
+import { RadioGroup } from "@modules/common/components/ui/radio-group"
 import { Spinner } from "@modules/common/components/ui/spinner"
-import { Separator } from "@modules/common/components/ui/separator"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
+
+const testPaymentProvider = "pp_system_default"
 
 export default function Payment({
   cart,
   availablePaymentMethods,
 }: {
   cart: HttpTypes.StoreCart
-  availablePaymentMethods: { id: string }[]
+  availablePaymentMethods: { id: string }[] | null
 }) {
   const session = cart.payment_collection?.payment_sessions?.find(
-    (item) => item.provider_id === "pp_system_default"
+    (item) => item.provider_id === testPaymentProvider
   )
   const [method, setMethod] = useState(session?.provider_id ?? "")
   const [pending, setPending] = useState(false)
-  const [error, setError] = useState("")
-  const params = useSearchParams()
+  const [error, setError] = useState<string | null>(null)
   const pathname = usePathname()
   const router = useRouter()
-  const open = params.get("step") === "payment"
-  const enabled = availablePaymentMethods.some(
-    (item) => item.id === "pp_system_default"
+  const open = useSearchParams().get("step") === "payment"
+  const enabled = availablePaymentMethods?.some(
+    (item) => item.id === testPaymentProvider
   )
 
   async function submit() {
     setPending(true)
-    setError("")
+    setError(null)
     try {
-      if (!session)
-        await initiatePaymentSession(cart, { provider_id: "pp_system_default" })
+      if (!session) {
+        await initiatePaymentSession(cart, { provider_id: testPaymentProvider })
+      }
       router.push(`${pathname}?step=review`, { scroll: false })
-    } catch (error) {
-      setError(error instanceof Error ? error.message : String(error))
+    } catch {
+      setError("결제 방법을 저장하지 못했습니다. 다시 시도해 주세요.")
     } finally {
       setPending(false)
     }
   }
 
   return (
-    <section className="checkout-step">
-      <div className="checkout-step-heading">
-        <h2>
-          <span>03</span> 결제 방법
-        </h2>
-        {!open && session && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() =>
-              router.push(`${pathname}?step=payment`, { scroll: false })
-            }
-          >
-            수정
-          </Button>
-        )}
-      </div>
+    <CheckoutStep step="payment" active={open} completed={Boolean(session)}>
       {open ? (
-        <div className="flex flex-col gap-6">
-          <RadioGroup
-            value={method}
-            onValueChange={(value) => setMethod(String(value))}
-            aria-label="결제 방법"
-          >
-            <Field orientation="horizontal" className="payment-choice">
-              <RadioGroupItem
+        <div className="grid gap-4">
+          {enabled ? (
+            <RadioGroup
+              value={method}
+              onValueChange={(value) => setMethod(String(value))}
+              disabled={pending}
+              aria-labelledby="checkout-payment-title"
+            >
+              <CheckoutChoice
                 id="system-payment"
-                value="pp_system_default"
-                disabled={!enabled}
+                value={testPaymentProvider}
+                label="테스트 결제"
+                description="카드 정보 입력 없이 테스트 주문을 진행합니다. 실제로 청구되지 않습니다."
               />
-              <div>
-                <FieldLabel htmlFor="system-payment">
-                  Medusa 테스트 결제
-                </FieldLabel>
-                <FieldDescription>
-                  POC 주문 체험용입니다. 카드 정보나 실제 결제가 필요하지
-                  않습니다.
-                </FieldDescription>
-              </div>
-            </Field>
-          </RadioGroup>
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            </RadioGroup>
+          ) : (
+            <p className="rounded-xl bg-muted p-4 text-sm text-muted-foreground">
+              {availablePaymentMethods
+                ? "선택할 수 있는 결제 방법이 없습니다."
+                : "결제 방법을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요."}
+            </p>
           )}
+          <ErrorMessage
+            error={error}
+            data-testid="payment-option-error-message"
+          />
           <Button
             size="lg"
+            className="w-full font-semibold"
             onClick={submit}
-            disabled={!method || pending}
+            disabled={!enabled || !method || pending}
             data-testid="submit-payment-button"
           >
-            {pending && <Spinner data-icon="inline-start" />}주문 내용 확인
+            {pending && <Spinner data-icon="inline-start" />}
+            주문 확인으로 계속
+            <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" />
           </Button>
         </div>
-      ) : (
-        session && (
-          <p data-testid="payment-method-summary">
-            Medusa 테스트 결제 · 실제 청구 없음
-          </p>
-        )
-      )}
-      <Separator className="mt-8" />
-    </section>
+      ) : session ? (
+        <p
+          className="rounded-xl bg-muted p-4 text-sm"
+          data-testid="payment-method-summary"
+        >
+          테스트 결제{" "}
+          <span className="text-muted-foreground">· 실제 청구 없음</span>
+        </p>
+      ) : null}
+    </CheckoutStep>
   )
 }

@@ -1,68 +1,59 @@
 "use client"
 
-import { cn as clx } from "@lib/utils"
-import { Heading, Text } from "@/components/typography"
-
-import PaymentButton from "../payment-button"
-import { useSearchParams } from "next/navigation"
-import { HttpTypes } from "@medusajs/types"
+import { InformationCircleIcon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
+import type { HttpTypes } from "@medusajs/types"
+import { CheckoutStep } from "@modules/checkout/components/checkout-step"
+import PaymentButton from "@modules/checkout/components/payment-button"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { useSearchParams } from "next/navigation"
 
-const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
-  const searchParams = useSearchParams()
-
-  const isOpen = searchParams.get("step") === "review"
-
+export default function Review({ cart }: { cart: HttpTypes.StoreCart }) {
+  const open = useSearchParams().get("step") === "review"
   const previousStepsCompleted =
     cart.shipping_address &&
     (cart.shipping_methods?.length ?? 0) > 0 &&
     cart.payment_collection
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
-            {
-              "opacity-50 pointer-events-none select-none": !isOpen,
-            }
-          )}
-        >
-          주문 확인
-        </Heading>
-      </div>
-      {isOpen && previousStepsCompleted && (
-        <>
-          <div className="flex items-start gap-x-1 w-full mb-6">
-            <div className="w-full">
-              <Text className="text-sm font-medium text-foreground mb-1">
-                주문 내용을 확인하고{" "}
-                <LocalizedClientLink href="/pages/terms" className="underline">
-                  이용약관
-                </LocalizedClientLink>
-                ,{" "}
-                <LocalizedClientLink href="/returns" className="underline">
-                  교환 및 반품 안내
-                </LocalizedClientLink>
-                ,{" "}
-                <LocalizedClientLink
-                  href="/pages/privacy"
-                  className="underline"
-                >
-                  개인정보처리방침
-                </LocalizedClientLink>
-                에 동의합니다. POC 테스트 주문이며 실제 결제나 배송은 진행되지
-                않습니다.
-              </Text>
-            </div>
-          </div>
+    <CheckoutStep step="review" active={open}>
+      {open && previousStepsCompleted && (
+        <div className="grid gap-4">
+          <p className="flex items-start gap-2.5 rounded-xl bg-accent p-4 text-sm leading-relaxed text-accent-foreground">
+            <HugeiconsIcon
+              icon={InformationCircleIcon}
+              className="mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            테스트 주문입니다. 실제 결제나 배송이 진행되지 않습니다.
+          </p>
+          <p className="break-keep text-sm leading-relaxed text-muted-foreground">
+            주문을 확정하면{" "}
+            <LocalizedClientLink
+              href="/pages/terms"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              이용약관
+            </LocalizedClientLink>
+            ,{" "}
+            <LocalizedClientLink
+              href="/returns"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              교환 및 반품 안내
+            </LocalizedClientLink>
+            ,{" "}
+            <LocalizedClientLink
+              href="/pages/privacy"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              개인정보처리방침
+            </LocalizedClientLink>
+            에 동의합니다.
+          </p>
           <PaymentButton cart={cart} data-testid="submit-order-button" />
-        </>
+        </div>
       )}
-    </div>
+    </CheckoutStep>
   )
 }
-
-export default Review

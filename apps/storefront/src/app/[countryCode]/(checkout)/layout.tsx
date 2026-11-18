@@ -1,7 +1,7 @@
 import Image from "next/image"
 import branding from "@/content/branding.json"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons"
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default function CheckoutLayout({
@@ -10,29 +10,29 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="w-full bg-white relative small:min-h-screen">
-      <div className="h-16 bg-white border-b ">
-        <nav className="flex h-full items-center content-container justify-between">
+    <div className="min-h-svh bg-muted">
+      <header className="border-b bg-background">
+        <nav
+          aria-label="주문 메뉴"
+          className="mx-auto grid h-16 max-w-[44rem] grid-cols-[1fr_auto_1fr] items-center px-4 md:px-8 small:max-w-[76rem]"
+        >
           <LocalizedClientLink
             href="/cart"
-            className="text-small-semi text-foreground flex items-center gap-x-2 uppercase flex-1 basis-0"
+            className="inline-flex min-h-11 w-fit items-center gap-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             data-testid="back-to-cart-link"
           >
             <HugeiconsIcon
-              icon={ArrowDown01Icon}
-              className="rotate-90"
-              size={16}
+              icon={ArrowLeft01Icon}
+              size={17}
+              aria-hidden="true"
             />
-            <span className="mt-px hidden small:block text-sm font-medium text-muted-foreground hover:text-foreground ">
-              장바구니로 돌아가기
-            </span>
-            <span className="mt-px block small:hidden text-sm font-medium text-muted-foreground hover:text-foreground">
-              Back
+            <span>
+              장바구니<span className="hidden sm:inline">로 돌아가기</span>
             </span>
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/"
-            className="text-xl font-semibold text-muted-foreground hover:text-foreground uppercase"
+            className="grid min-h-11 place-items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             data-testid="store-link"
           >
             <Image
@@ -40,16 +40,12 @@ export default function CheckoutLayout({
               alt="SHOKZ"
               width={187}
               height={55}
-              className="brand-logo-image checkout-logo"
+              className="h-auto w-[88px] invert sm:w-[102px]"
             />
           </LocalizedClientLink>
-          <div className="flex-1 basis-0" />
         </nav>
-      </div>
-      <div className="relative" data-testid="checkout-container">
-        {children}
-      </div>
-      <div className="py-4 w-full flex items-center justify-center"></div>
+      </header>
+      <div data-testid="checkout-container">{children}</div>
     </div>
   )
 }

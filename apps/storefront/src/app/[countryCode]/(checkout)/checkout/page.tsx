@@ -19,9 +19,14 @@ export default async function Checkout() {
   const customer = await retrieveCustomer()
 
   return (
-    <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-12 py-12 checkout-layout">
-      <CheckoutForm cart={cart} customer={customer} />
-      <CheckoutSummary cart={cart} />
+    <div className="mx-auto max-w-[44rem] px-4 pb-12 pt-6 md:px-8 small:max-w-[76rem] small:pb-16 small:pt-10">
+      <h1 className="mb-5 text-[32px] font-bold leading-tight tracking-[-0.04em] small:mb-7 small:text-[38px]">
+        주문하기
+      </h1>
+      <div className="grid items-start gap-4 small:grid-cols-[minmax(0,1fr)_360px] small:gap-8">
+        <CheckoutSummary cart={cart} />
+        <CheckoutForm cart={cart} customer={customer} />
+      </div>
     </div>
   )
 }

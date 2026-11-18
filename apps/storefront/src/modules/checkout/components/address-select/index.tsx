@@ -1,8 +1,14 @@
 "use client"
 
-import { useMemo } from "react"
+import { useId } from "react"
 import type { HttpTypes } from "@medusajs/types"
+import { Location01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import compareAddresses from "@lib/util/compare-addresses"
+import {
+  getAddressValues,
+  type AddressValues,
+} from "@modules/checkout/components/address-fields"
 import {
   Select,
   SelectTrigger,
@@ -19,45 +25,49 @@ export default function AddressSelect({
   onSelect,
 }: {
   addresses: HttpTypes.StoreCustomerAddress[]
-  addressInput: HttpTypes.StoreCartAddress | null
-  onSelect: (
-    address: HttpTypes.StoreCartAddress | undefined,
-    email?: string
-  ) => void
+  addressInput: AddressValues
+  onSelect: (address: HttpTypes.StoreCustomerAddress) => void
 }) {
-  const selected = useMemo(
-    () =>
-      addresses.find(
-        (address) => addressInput && compareAddresses(address, addressInput)
-      ),
-    [addresses, addressInput]
+  const id = useId()
+  const selected = addresses.find((address) =>
+    compareAddresses(getAddressValues(address), addressInput)
   )
-  const items = [
-    { value: "", label: "저장된 배송지를 선택해 주세요" },
-    ...addresses.map((address) => ({
-      value: address.id,
-      label: [address.first_name, address.last_name, address.address_1]
-        .filter(Boolean)
-        .join(" "),
-    })),
-  ]
+  const items = addresses.map((address) => ({
+    value: address.id,
+    label: [
+      address.last_name,
+      address.first_name,
+      "·",
+      address.address_1,
+      address.address_2,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  }))
   return (
-    <Field>
-      <FieldLabel htmlFor="saved-address">저장된 배송지</FieldLabel>
+    <Field className="rounded-xl border bg-muted p-3 sm:p-4">
+      <FieldLabel htmlFor={id} className="items-center">
+        <HugeiconsIcon
+          icon={Location01Icon}
+          className="size-4 text-accent-foreground"
+          aria-hidden="true"
+        />
+        저장된 배송지
+      </FieldLabel>
       <Select
         items={items}
-        value={selected?.id ?? ""}
-        onValueChange={(id) => {
-          const address = addresses.find((item) => item.id === id)
-          if (address) onSelect(address as HttpTypes.StoreCartAddress)
+        value={selected?.id ?? null}
+        onValueChange={(addressId) => {
+          const address = addresses.find((item) => item.id === addressId)
+          if (address) onSelect(address)
         }}
       >
         <SelectTrigger
-          id="saved-address"
+          id={id}
           className="w-full"
           data-testid="shipping-address-select"
         >
-          <SelectValue />
+          <SelectValue placeholder="저장된 배송지를 선택해 주세요" />
         </SelectTrigger>
         <SelectContent alignItemWithTrigger={false}>
           <SelectGroup>
@@ -65,6 +75,7 @@ export default function AddressSelect({
               <SelectItem
                 key={item.value}
                 value={item.value}
+                className="min-h-10 [&>span:first-child]:min-w-0 [&>span:first-child]:whitespace-normal"
                 data-testid="shipping-address-option"
               >
                 {item.label}

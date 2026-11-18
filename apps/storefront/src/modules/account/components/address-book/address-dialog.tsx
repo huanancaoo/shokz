@@ -6,6 +6,7 @@ import type { HttpTypes } from "@medusajs/types"
 import { useId, useRef, useState, useTransition } from "react"
 import type { FormEvent, ReactElement } from "react"
 import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
+import { getCountryOptions } from "@lib/util/country-options"
 import Input from "@modules/common/components/input"
 import { Alert, AlertDescription } from "@modules/common/components/ui/alert"
 import { Button } from "@modules/common/components/ui/button"
@@ -20,10 +21,7 @@ import {
   DialogTrigger,
 } from "@modules/common/components/ui/dialog"
 import { Field, FieldLabel } from "@modules/common/components/ui/field"
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@modules/common/components/ui/native-select"
+import { SelectControl } from "@modules/common/components/ui/select-control"
 import { Spinner } from "@modules/common/components/ui/spinner"
 
 export default function AddressDialog({
@@ -49,6 +47,13 @@ export default function AddressDialog({
   const showSavedCountry =
     savedCountry &&
     !region.countries?.some((country) => country.iso_2 === savedCountry)
+  const countryOptions = getCountryOptions(region.countries)
+  if (showSavedCountry) {
+    countryOptions.push({
+      value: savedCountry,
+      label: savedCountry.toUpperCase(),
+    })
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -113,7 +118,7 @@ export default function AddressDialog({
           className="flex min-h-0 flex-col"
           aria-busy={pending}
         >
-          <div className="min-h-0 space-y-5 overflow-y-auto overscroll-contain px-5 py-5 max-md:[&_input]:text-base max-md:[&_select]:text-base sm:px-7">
+          <div className="min-h-0 space-y-5 overflow-y-auto overscroll-contain px-5 py-5 max-md:[&_input]:text-base sm:px-7">
             <fieldset disabled={pending} className="min-w-0">
               <legend className="mb-3 text-sm font-semibold">받는 분</legend>
               <div className="grid grid-cols-2 gap-x-3 gap-y-3">
@@ -160,32 +165,17 @@ export default function AddressDialog({
                   <FieldLabel htmlFor={countryId}>
                     국가 / 지역 <span aria-hidden="true">*</span>
                   </FieldLabel>
-                  <NativeSelect
+                  <SelectControl
                     id={countryId}
-                    className="w-full min-w-0"
                     name="country_code"
                     autoComplete="shipping country"
                     defaultValue={savedCountry ?? countryCode}
+                    items={countryOptions}
+                    placeholder="국가 선택"
+                    disabled={pending}
                     required
                     data-testid="country-select"
-                  >
-                    <NativeSelectOption value="">국가 선택</NativeSelectOption>
-                    {region.countries?.map((country) => (
-                      <NativeSelectOption
-                        key={country.iso_2}
-                        value={country.iso_2}
-                      >
-                        {country.iso_2 === "kr"
-                          ? "대한민국"
-                          : country.display_name}
-                      </NativeSelectOption>
-                    ))}
-                    {showSavedCountry && (
-                      <NativeSelectOption value={savedCountry}>
-                        {savedCountry.toUpperCase()}
-                      </NativeSelectOption>
-                    )}
-                  </NativeSelect>
+                  />
                 </Field>
                 <Input
                   label="우편번호"

@@ -19,6 +19,26 @@ export default defineConfig([
       ],
     },
   },
+  {
+    files: ["src/**/*.{js,jsx,ts,tsx}"],
+    ignores: ["src/modules/common/components/ui/**"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "JSXOpeningElement[name.name=/^(button|select|option|optgroup|textarea|dialog|details|summary)$/]",
+          message:
+            "Use the storefront shadcn UI controls for interactive elements.",
+        },
+        {
+          selector:
+            "JSXOpeningElement[name.name='input']:not(:has(> JSXAttribute[name.name='type'][value.value='hidden']))",
+          message: "Use a shadcn Input for visible form fields.",
+        },
+      ],
+    },
+  },
   globalIgnores([
     ".next/**",
     "out/**",

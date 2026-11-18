@@ -1,6 +1,7 @@
 "use client"
 
 import { cn as clx } from "@lib/utils"
+import { Button } from "@modules/common/components/ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export function Pagination({
@@ -33,8 +34,10 @@ export function Pagination({
     label: string | number,
     isCurrent: boolean
   ) => (
-    <button
+    <Button
       key={p}
+      variant="ghost"
+      type="button"
       className={clx("text-xl font-semibold text-muted-foreground", {
         "text-foreground hover:text-muted-foreground": isCurrent,
       })}
@@ -42,7 +45,7 @@ export function Pagination({
       onClick={() => handlePageChange(p)}
     >
       {label}
-    </button>
+    </Button>
   )
 
   // Function to render ellipsis

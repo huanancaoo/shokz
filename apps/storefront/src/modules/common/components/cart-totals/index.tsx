@@ -4,6 +4,7 @@ import { convertToLocale } from "@lib/util/money"
 import React from "react"
 
 type CartTotalsProps = {
+  shippingPending?: boolean
   totals: {
     total?: number | null
     subtotal?: number | null
@@ -15,7 +16,10 @@ type CartTotalsProps = {
   }
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({
+  totals,
+  shippingPending = false,
+}) => {
   const {
     currency_code,
     total,
@@ -37,7 +41,12 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         <div className="flex items-center justify-between">
           <span>배송비</span>
           <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+            {shippingPending
+              ? "배송 방법 선택 후 계산"
+              : convertToLocale({
+                  amount: shipping_subtotal ?? 0,
+                  currency_code,
+                })}
           </span>
         </div>
         {!!discount_subtotal && (
@@ -65,16 +74,16 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
       </div>
       <div className="h-px w-full border-b border-gray-200 my-4" />
       <div className="flex items-center justify-between text-foreground mb-2 text-sm ">
-        <span>합계</span>
+        <span>{shippingPending ? "예상 합계" : "합계"}</span>
         <span
-          className="text-xl font-semibold"
+          className="text-xl font-bold tabular-nums"
+          aria-live="polite"
           data-testid="cart-total"
           data-value={total || 0}
         >
           {convertToLocale({ amount: total ?? 0, currency_code })}
         </span>
       </div>
-      <div className="h-px w-full border-b border-gray-200 mt-4" />
     </div>
   )
 }

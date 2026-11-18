@@ -10,22 +10,16 @@ export default async function CheckoutForm({
   cart,
   customer,
 }: {
-  cart: HttpTypes.StoreCart | null
+  cart: HttpTypes.StoreCart
   customer: HttpTypes.StoreCustomer | null
 }) {
-  if (!cart) {
-    return null
-  }
-
-  const shippingMethods = await listCartShippingMethods(cart.id)
-  const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "")
-
-  if (!shippingMethods || !paymentMethods) {
-    return null
-  }
+  const [shippingMethods, paymentMethods] = await Promise.all([
+    listCartShippingMethods(cart.id),
+    listCartPaymentMethods(cart.region?.id ?? ""),
+  ])
 
   return (
-    <div className="w-full grid grid-cols-1 gap-y-8">
+    <div className="min-w-0 rounded-2xl border bg-background small:col-start-1 small:row-start-1">
       <Addresses cart={cart} customer={customer} />
 
       <Shipping cart={cart} availableShippingMethods={shippingMethods} />

@@ -1,4 +1,7 @@
 import { cn as clx } from "@lib/utils"
+import { Button } from "@modules/common/components/ui/button"
+import { Input } from "@modules/common/components/ui/input"
+import { Label } from "@modules/common/components/ui/label"
 
 type SearchFormProps = {
   countryCode: string
@@ -22,10 +25,10 @@ const SearchForm = ({
       tooldescription: "Search the store's products by keyword",
     }}
   >
-    <label htmlFor="search-q" className="sr-only">
+    <Label htmlFor="search-q" className="sr-only">
       Search products
-    </label>
-    <input
+    </Label>
+    <Input
       id="search-q"
       type="search"
       name="q"
@@ -33,12 +36,12 @@ const SearchForm = ({
       placeholder="Search products"
       className="flex-1 h-10 px-4 border rounded-md border-border bg-background text-sm"
     />
-    <button
+    <Button
       type="submit"
-      className="h-10 px-4 rounded-md bg-black text-white hover:bg-gray-800"
+      className="h-[46px] px-4 rounded-md bg-black text-white hover:bg-gray-800"
     >
       Search
-    </button>
+    </Button>
   </form>
 )
 

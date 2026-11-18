@@ -2,6 +2,10 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { Button } from "@modules/common/components/ui/button"
+import { Input } from "@modules/common/components/ui/input"
+import { Label } from "@modules/common/components/ui/label"
+import { Textarea } from "@modules/common/components/ui/textarea"
 
 export type EditorialPage = {
   slug: string
@@ -63,32 +67,32 @@ export default function Editorial({ page }: { page: EditorialPage }) {
         {["registration", "business", "support"].includes(page.slug) && (
           <section className="display-form">
             <h2>{page.slug === "registration" ? "정품 등록" : "문의하기"}</h2>
-            <label>
+            <Label>
               이름
-              <input disabled placeholder="이름을 입력해 주세요" />
-            </label>
-            <label>
+              <Input disabled placeholder="이름을 입력해 주세요" />
+            </Label>
+            <Label>
               이메일
-              <input disabled type="email" placeholder="이메일 주소" />
-            </label>
+              <Input disabled type="email" placeholder="이메일 주소" />
+            </Label>
             {page.slug === "registration" ? (
-              <label>
+              <Label>
                 제품 시리얼 번호
-                <input disabled placeholder="제품 시리얼 번호" />
-              </label>
+                <Input disabled placeholder="제품 시리얼 번호" />
+              </Label>
             ) : (
-              <label>
+              <Label>
                 문의 내용
-                <textarea
+                <Textarea
                   disabled
                   placeholder="문의 내용을 입력해 주세요"
                   rows={4}
                 />
-              </label>
+              </Label>
             )}
-            <button className="shokz-button" disabled>
+            <Button size="lg" className="shokz-button" disabled>
               전시용 양식 · 제출할 수 없습니다
-            </button>
+            </Button>
           </section>
         )}
         <div className="mt-12">

@@ -5,10 +5,7 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons"
 import { Button, buttonVariants } from "@modules/common/components/ui/button"
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@modules/common/components/ui/native-select"
+import { SelectControl } from "@modules/common/components/ui/select-control"
 import {
   InputGroup,
   InputGroupInput,
@@ -19,6 +16,7 @@ import { searchCatalog } from "@lib/data/search"
 import { listCategories } from "@lib/data/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductPreview from "@modules/products/components/product-preview"
+import { FilterDisclosure } from "@modules/store/components/filter-disclosure"
 
 export type CatalogParams = {
   q?: string
@@ -57,6 +55,36 @@ export default async function Catalog({
   const title = filters.q
     ? `“${filters.q}” 검색 결과`
     : selectedCategory?.name || "모든 샥즈를 만나보세요."
+  const fields = [
+    {
+      name: "feature",
+      label: "기능",
+      items: [
+        { value: "", label: "모든 기능" },
+        ...features.map((feature) => ({ value: feature, label: feature })),
+      ],
+    },
+    {
+      name: "max",
+      label: "가격",
+      items: [
+        { value: "", label: "모든 가격" },
+        { value: "100000", label: "10만원 이하" },
+        { value: "200000", label: "20만원 이하" },
+        { value: "300000", label: "30만원 이하" },
+      ],
+    },
+    {
+      name: "sort",
+      label: "정렬",
+      items: [
+        { value: "", label: "추천순" },
+        { value: "price_asc", label: "낮은 가격순" },
+        { value: "price_desc", label: "높은 가격순" },
+      ],
+    },
+  ] as const
+
   return (
     <div className="catalog-page content-container">
       <div className="catalog-intro">
@@ -94,61 +122,24 @@ export default async function Catalog({
             aria-label="제품 검색"
           />
         </InputGroup>
-        <details className="mobile-filter" open>
-          <summary>필터 및 정렬</summary>
+        <FilterDisclosure>
           <div className="filter-fields">
-            <Field>
-              <FieldLabel htmlFor="catalog-feature">기능</FieldLabel>
-              <NativeSelect
-                id="catalog-feature"
-                name="feature"
-                defaultValue={filters.feature}
+            {fields.map(({ name, label, items }) => (
+              <Field
+                key={name}
+                className="min-w-0 max-w-[180px] max-md:max-w-[140px]"
               >
-                <NativeSelectOption value="">모든 기능</NativeSelectOption>
-                {features.map((feature) => (
-                  <NativeSelectOption key={feature}>
-                    {feature}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="catalog-price">가격</FieldLabel>
-              <NativeSelect
-                id="catalog-price"
-                name="max"
-                defaultValue={filters.max}
-              >
-                <NativeSelectOption value="">모든 가격</NativeSelectOption>
-                <NativeSelectOption value="100000">
-                  10만원 이하
-                </NativeSelectOption>
-                <NativeSelectOption value="200000">
-                  20만원 이하
-                </NativeSelectOption>
-                <NativeSelectOption value="300000">
-                  30만원 이하
-                </NativeSelectOption>
-              </NativeSelect>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="catalog-sort">정렬</FieldLabel>
-              <NativeSelect
-                id="catalog-sort"
-                name="sort"
-                defaultValue={filters.sort}
-              >
-                <NativeSelectOption value="">추천순</NativeSelectOption>
-                <NativeSelectOption value="price_asc">
-                  낮은 가격순
-                </NativeSelectOption>
-                <NativeSelectOption value="price_desc">
-                  높은 가격순
-                </NativeSelectOption>
-              </NativeSelect>
-            </Field>
+                <FieldLabel htmlFor={`catalog-${name}`}>{label}</FieldLabel>
+                <SelectControl
+                  id={`catalog-${name}`}
+                  name={name}
+                  items={items}
+                  defaultValue={filters[name] ?? ""}
+                />
+              </Field>
+            ))}
           </div>
-        </details>
+        </FilterDisclosure>
         <Button type="submit" size="lg">
           적용
         </Button>

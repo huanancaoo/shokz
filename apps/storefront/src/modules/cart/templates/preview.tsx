@@ -26,10 +26,12 @@ const ItemsPreviewTemplate = ({ cart }: ItemsTemplateProps) => {
       <Table>
         <TableBody data-testid="items-table">
           {items
-            ? items
-                .sort((a, b) => {
-                  return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
-                })
+            ? [...items]
+                .sort(
+                  (a, b) =>
+                    new Date(b.created_at ?? 0).getTime() -
+                    new Date(a.created_at ?? 0).getTime()
+                )
                 .map((item) => {
                   return (
                     <Item

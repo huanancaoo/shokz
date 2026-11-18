@@ -3,12 +3,10 @@
 import { useId } from "react"
 import type { HttpTypes } from "@medusajs/types"
 import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
+import { getCountryOptions } from "@lib/util/country-options"
 import Input from "@modules/common/components/input"
 import { Field, FieldLabel } from "@modules/common/components/ui/field"
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@modules/common/components/ui/native-select"
+import { SelectControl } from "@modules/common/components/ui/select-control"
 import AccountInfo from "../account-info"
 
 export default function ProfileBillingAddress({
@@ -22,10 +20,10 @@ export default function ProfileBillingAddress({
   const billing = customer.addresses?.find(
     (address) => address.is_default_billing
   )
-  const countries = regions.flatMap((region) => region.countries ?? [])
-  const countryLabel = (country: HttpTypes.StoreRegionCountry) =>
-    country.iso_2 === "kr" ? "대한민국" : country.display_name
-  const country = countries.find(({ iso_2 }) => iso_2 === billing?.country_code)
+  const countries = regions.flatMap((region) =>
+    getCountryOptions(region.countries)
+  )
+  const country = countries.find(({ value }) => value === billing?.country_code)
 
   async function saveBillingAddress(data: FormData) {
     const result = billing
@@ -61,9 +59,7 @@ export default function ProfileBillingAddress({
             <p className="text-sm font-normal text-muted-foreground">
               {[
                 billing.postal_code,
-                country
-                  ? countryLabel(country)
-                  : billing.country_code?.toUpperCase(),
+                country?.label ?? billing.country_code?.toUpperCase(),
               ]
                 .filter(Boolean)
                 .join(" · ")}
@@ -113,22 +109,16 @@ export default function ProfileBillingAddress({
           <FieldLabel htmlFor={countryId}>
             국가 / 지역 <span aria-hidden="true">*</span>
           </FieldLabel>
-          <NativeSelect
+          <SelectControl
             id={countryId}
-            className="w-full min-w-0"
             name="country_code"
             autoComplete="billing country"
-            defaultValue={billing?.country_code ?? ""}
+            defaultValue={billing?.country_code ?? null}
+            placeholder="국가 선택"
+            items={countries}
             required
             data-testid="billing-country-code-select"
-          >
-            <NativeSelectOption value="">국가 선택</NativeSelectOption>
-            {countries.map((option) => (
-              <NativeSelectOption key={option.iso_2} value={option.iso_2}>
-                {countryLabel(option)}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+          />
         </Field>
         <Input
           label="우편번호"

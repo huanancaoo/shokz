@@ -1,31 +1,33 @@
-import { Heading } from "@/components/typography"
-
+import { convertToLocale } from "@lib/util/money"
+import type { HttpTypes } from "@medusajs/types"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import DiscountCode from "@modules/checkout/components/discount-code"
+import { OrderSummaryPanel } from "@modules/checkout/components/order-summary-panel"
 import CartTotals from "@modules/common/components/cart-totals"
-import Divider from "@modules/common/components/divider"
-import { HttpTypes } from "@medusajs/types"
 
-const CheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
+export default function CheckoutSummary({
+  cart,
+}: {
+  cart: HttpTypes.StoreCart
+}) {
+  const quantity =
+    cart.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
+  const shippingPending = !cart.shipping_methods?.length
+
   return (
-    <div className="sticky top-0 flex flex-col-reverse small:flex-col gap-y-8 py-8 small:py-0 ">
-      <div className="w-full bg-white flex flex-col">
-        <Divider className="my-6 small:hidden" />
-        <Heading
-          level="h2"
-          className="flex flex-row text-3xl-regular items-baseline"
-        >
-          장바구니 상품
-        </Heading>
-        <Divider className="my-6" />
-        <CartTotals totals={cart} />
-        <ItemsPreviewTemplate cart={cart} />
-        <div className="my-6">
-          <DiscountCode cart={cart} />
-        </div>
+    <OrderSummaryPanel
+      total={convertToLocale({
+        amount: cart.total ?? 0,
+        currency_code: cart.currency_code,
+      })}
+      totalLabel={shippingPending ? "예상 합계" : "합계"}
+      quantity={quantity}
+    >
+      <ItemsPreviewTemplate cart={cart} />
+      <div className="mb-4 border-y">
+        <DiscountCode cart={cart} />
       </div>
-    </div>
+      <CartTotals totals={cart} shippingPending={shippingPending} />
+    </OrderSummaryPanel>
   )
 }
-
-export default CheckoutSummary

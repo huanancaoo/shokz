@@ -1,35 +1,37 @@
 "use client"
 
-import { forwardRef, useId } from "react"
-import type { SelectHTMLAttributes } from "react"
+import { useId } from "react"
 import type { HttpTypes } from "@medusajs/types"
+import { getCountryOptions } from "@lib/util/country-options"
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@modules/common/components/ui/native-select"
+  SelectControl,
+  type SelectControlProps,
+} from "@modules/common/components/ui/select-control"
 import { Field, FieldLabel } from "@modules/common/components/ui/field"
 
-const CountrySelect = forwardRef<
-  HTMLSelectElement,
-  Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> & {
-    region?: HttpTypes.StoreRegion
-    placeholder?: string
-  }
->(({ region, placeholder = "국가 / 지역", id, ...props }, ref) => {
-  const uid = useId()
+export default function CountrySelect({
+  region,
+  required,
+  ...props
+}: Omit<SelectControlProps, "items" | "id"> & {
+  region?: HttpTypes.StoreRegion
+}) {
+  const id = useId()
+  const items = getCountryOptions(region?.countries)
+
   return (
     <Field>
-      <FieldLabel htmlFor={id ?? uid}>{placeholder}</FieldLabel>
-      <NativeSelect id={id ?? uid} ref={ref} {...props}>
-        <NativeSelectOption value="">국가를 선택해 주세요</NativeSelectOption>
-        {region?.countries?.map((country) => (
-          <NativeSelectOption key={country.iso_2} value={country.iso_2}>
-            {country.iso_2 === "kr" ? "대한민국" : country.display_name}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
+      <FieldLabel htmlFor={id}>
+        국가 / 지역
+        {required && <span aria-hidden="true">*</span>}
+      </FieldLabel>
+      <SelectControl
+        id={id}
+        items={items}
+        required={required}
+        placeholder="국가 선택"
+        {...props}
+      />
     </Field>
   )
-})
-CountrySelect.displayName = "CountrySelect"
-export default CountrySelect
+}

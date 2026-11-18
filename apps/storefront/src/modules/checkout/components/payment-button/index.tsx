@@ -45,7 +45,7 @@ export default function PaymentButton({
     <>
       <Button
         size="lg"
-        className="w-full"
+        className="w-full font-semibold"
         onClick={submit}
         disabled={!ready || pending}
         data-testid={testId}

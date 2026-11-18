@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@modules/common/components/ui/accordion"
+import { Toggle } from "@modules/common/components/ui/toggle"
 import { useEffect, useState } from "react"
 
 import { sdk } from "@lib/config"
@@ -137,9 +138,11 @@ const OptionsPicker = ({
                     const isSelected = selectedValueIds.includes(value.id)
 
                     return (
-                      <button
+                      <Toggle
                         key={value.id}
-                        onClick={() => toggleValue(value.id)}
+                        variant="outline"
+                        pressed={isSelected}
+                        onPressedChange={() => toggleValue(value.id)}
                         className={clsx(
                           "border-border border text-small-regular h-10 rounded-rounded px-3 flex items-center transition-colors duration-150",
                           {
@@ -148,10 +151,9 @@ const OptionsPicker = ({
                               !isSelected,
                           }
                         )}
-                        aria-pressed={isSelected}
                       >
                         {value.label}
-                      </button>
+                      </Toggle>
                     )
                   })}
                 </div>

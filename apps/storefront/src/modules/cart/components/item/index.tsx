@@ -51,11 +51,17 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <TableRow className="w-full" data-testid="product-row">
-      <TableCell className="!pl-0 p-4 w-24">
+      <TableCell
+        className={
+          type === "preview" ? "w-[68px] py-3 pl-0 pr-3" : "!pl-0 p-4 w-24"
+        }
+      >
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
+          aria-label={item.product_title}
           className={clx("flex", {
-            "w-16": type === "preview",
+            "relative w-14 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring":
+              type === "preview",
             "small:w-24 w-12": type === "full",
           })}
         >
@@ -63,11 +69,25 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             thumbnail={item.thumbnail}
             images={item.variant?.product?.images}
             size="square"
+            className={type === "preview" ? "rounded-xl" : undefined}
           />
+          {type === "preview" && (
+            <span
+              aria-hidden="true"
+              className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-foreground px-1 text-[11px] font-medium tabular-nums text-background"
+            >
+              {item.quantity}
+            </span>
+          )}
         </LocalizedClientLink>
       </TableCell>
 
-      <TableCell className="text-left">
+      <TableCell
+        className={clx(
+          "text-left",
+          type === "preview" && "whitespace-normal break-words px-0"
+        )}
+      >
         <Text
           className="text-sm font-medium text-foreground"
           data-testid="product-title"
@@ -75,6 +95,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           {item.product_title}
         </Text>
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
+        {type === "preview" && (
+          <span className="sr-only">수량 {item.quantity}개</span>
+        )}
       </TableCell>
 
       {type === "full" && (
@@ -83,26 +106,10 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             <DeleteButton id={item.id} data-testid="product-delete-button" />
             <CartItemSelect
               value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
-              data-testid="product-select-button"
-            >
-              {/* TODO: Update this with the v2 way of managing inventory */}
-              {Array.from(
-                {
-                  length: Math.min(maxQuantity, 10),
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
-                  </option>
-                )
-              )}
-
-              <option value={1} key={1}>
-                1
-              </option>
-            </CartItemSelect>
+              maxQuantity={Math.min(maxQuantity, 10)}
+              onChange={changeQuantity}
+              disabled={updating}
+            />
             {updating && <HugeiconsIcon icon={Loading03Icon} />}
           </div>
           <ErrorMessage error={error} data-testid="product-error-message" />
@@ -122,19 +129,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       <TableCell className="!pr-0">
         <span
           className={clx("!pr-0", {
-            "flex flex-col items-end h-full justify-center": type === "preview",
+            "flex flex-col items-end pl-2 tabular-nums": type === "preview",
           })}
         >
-          {type === "preview" && (
-            <span className="flex gap-x-1 ">
-              <Text className="text-muted-foreground">{item.quantity}x </Text>
-              <LineItemUnitPrice
-                item={item}
-                style="tight"
-                currencyCode={currencyCode}
-              />
-            </span>
-          )}
           <LineItemPrice
             item={item}
             style="tight"
