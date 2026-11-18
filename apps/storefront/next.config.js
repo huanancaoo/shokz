@@ -10,6 +10,9 @@ const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const mediaOrigin = new URL(process.env.MEDUSA_PUBLIC_URL ?? "http://localhost:9001")
 const selfHosted = process.env.SHOKZ_SELF_HOSTED === "1"
+const defaultCountryCode = (
+  process.env.NEXT_PUBLIC_DEFAULT_REGION || "kr"
+).toLowerCase()
 
 /**
  * @type {import('next').NextConfig}
@@ -28,6 +31,11 @@ const nextConfig = {
         source: "/:countryCode/products/:handle",
         headers: [{ key: "Vary", value: "Accept" }],
       },
+    ]
+  },
+  async redirects() {
+    return [
+      { source: "/", destination: `/${defaultCountryCode}`, permanent: false },
     ]
   },
   async rewrites() {

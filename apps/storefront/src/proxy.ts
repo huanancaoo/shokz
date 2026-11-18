@@ -84,11 +84,10 @@ async function getCountryCode(
   return countryCode
 }
 
-/**
- * Middleware to handle region selection and onboarding status.
- */
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.includes(".")) {
+  const { pathname, search, origin } = request.nextUrl
+
+  if (pathname.includes(".")) {
     return NextResponse.next()
   }
 
@@ -96,34 +95,21 @@ export async function proxy(request: NextRequest) {
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
   const regionMap = await getRegionMap(cacheId)
-  const countryCode = await getCountryCode(request, regionMap)
+  const country = (await getCountryCode(request, regionMap)) || DEFAULT_REGION
+  const firstPathSegment = pathname.split("/")[1]?.toLowerCase()
 
-  // if the country code is available, use it, otherwise use the default region
-  const country = countryCode || DEFAULT_REGION
-  const firstPathSegment = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
-  const urlHasCountry = firstPathSegment === country.toLowerCase()
-
-  // Serve the default region at "/" instead of redirecting, so agents and
-  // crawlers get the storefront content directly from the root URL.
-  if (urlHasCountry || request.nextUrl.pathname === "/") {
-    const response = urlHasCountry
-      ? NextResponse.next()
-      : NextResponse.rewrite(new URL(`/${country}`, request.url))
-    if (!cacheIdCookie) {
-      response.cookies.set("_medusa_cache_id", cacheId, {
-        maxAge: 60 * 60 * 24,
-      })
-    }
-    return response
+  if (firstPathSegment !== country.toLowerCase()) {
+    return NextResponse.redirect(`${origin}/${country}${pathname}${search}`, 307)
   }
 
-  // if the url doesn't have the country, redirect to it
-  const redirectPath =
-    request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
-  const queryString = request.nextUrl.search || ""
-  const redirectUrl = `${request.nextUrl.origin}/${country}${redirectPath}${queryString}`
+  const response = NextResponse.next()
+  if (!cacheIdCookie) {
+    response.cookies.set("_medusa_cache_id", cacheId, {
+      maxAge: 60 * 60 * 24,
+    })
+  }
 
-  return NextResponse.redirect(redirectUrl, 307)
+  return response
 }
 
 export const config = {
