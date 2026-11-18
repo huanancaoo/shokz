@@ -2,7 +2,7 @@ const path = require("node:path")
 
 const release = path.resolve(__dirname, "../..")
 const backend = path.join(release, "apps/backend")
-const storefront = path.join(release, "apps/storefront/.next/standalone/apps/storefront")
+const storefront = path.join(release, "storefront/apps/storefront")
 const node = "/opt/shokz/node/bin/node"
 
 const processOptions = {
@@ -20,7 +20,7 @@ module.exports = {
     {
       ...processOptions,
       name: "shokz-medusa",
-      cwd: path.join(backend, ".medusa/server"),
+      cwd: backend,
       script: path.join(backend, "node_modules/@medusajs/cli/cli.js"),
       args: ["start", "--host", "127.0.0.1", "--port", "19001"],
     },
