@@ -9,13 +9,14 @@ checkEnvVariables()
 const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const mediaOrigin = new URL(process.env.MEDUSA_PUBLIC_URL ?? "http://localhost:9001")
+const selfHosted = process.env.SHOKZ_SELF_HOSTED === "1"
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
-  output: process.env.SHOKZ_SELF_HOSTED === "1" ? "standalone" : undefined,
+  ...(selfHosted ? { output: "standalone", experimental: { cpus: 1 } } : {}),
   outputFileTracingRoot: path.resolve(__dirname, "../.."),
   async headers() {
     return [
