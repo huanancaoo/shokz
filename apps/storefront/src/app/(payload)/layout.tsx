@@ -4,6 +4,7 @@ import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts"
 import type { ServerFunctionClient } from "payload"
 import type { ReactNode } from "react"
 import { importMap } from "./admin/importMap.js"
+import "./admin-theme.css"
 
 const serverFunction: ServerFunctionClient = async (args) => {
   "use server"
@@ -14,6 +15,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <RootLayout
       config={config}
+      htmlProps={{ className: "shokz-cms" }}
       importMap={importMap}
       serverFunction={serverFunction}
     >

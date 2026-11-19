@@ -1,0 +1,247 @@
+@tailwind utilities;
+
+.shokz-cms {
+  --background: 0 0% 10%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 13%;
+  --card-foreground: var(--foreground);
+  --popover: 0 0% 15%;
+  --popover-foreground: var(--foreground);
+  --primary: 0 0% 94%;
+  --primary-foreground: 0 0% 10%;
+  --secondary: 221 22% 27%;
+  --secondary-foreground: 222 45% 95%;
+  --muted: 0 0% 17%;
+  --muted-foreground: 0 0% 70%;
+  --accent: var(--secondary);
+  --accent-foreground: var(--secondary-foreground);
+  --border: 0 0% 24%;
+  --input: 0 0% 31%;
+  --ring: 215 57% 72%;
+  --destructive: 0 76% 72%;
+  --radius: 0.5rem;
+  --radius-md: 0.5rem;
+
+  --theme-bg: hsl(var(--background));
+  --theme-text: hsl(var(--foreground));
+  --theme-input-bg: hsl(var(--background));
+  --theme-elevation-0: hsl(var(--background));
+  --theme-elevation-50: hsl(var(--muted));
+  --theme-elevation-100: hsl(var(--border));
+  --theme-elevation-150: hsl(var(--input));
+  --style-radius-s: 5px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
+  --accessibility-outline: 2px solid hsl(var(--ring));
+  color-scheme: dark;
+}
+
+.shokz-cms :where([data-slot="card"], [data-slot="popover-content"], [data-slot="alert"]) {
+  border: 1px solid hsl(var(--border));
+}
+
+.shokz-cms :where([data-slot="button"], [data-slot="input"], [data-slot="input-group"], [data-slot="checkbox"], [data-slot="empty"]) {
+  border-style: solid;
+}
+
+.shokz-cms :where([data-slot="input"], [data-slot="input-group"]) {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.shokz-cms :where([data-slot="input"], [data-slot="button"], [data-slot="checkbox"]):focus-visible,
+.shokz-cms [data-slot="input-group"]:focus-within {
+  outline: var(--accessibility-outline);
+  outline-offset: 1px;
+}
+
+.shokz-cms .app-header,
+.shokz-cms .nav {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.shokz-cms .app-header {
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.shokz-cms .nav__scroll {
+  padding: 0;
+}
+
+.shokz-sidebar-brand {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 2.5rem;
+}
+
+.shokz-sidebar-brand .shokz-wordmark {
+  width: 10rem;
+  height: auto;
+  margin-inline-start: -1.35rem;
+}
+
+.shokz-cms .step-nav__home {
+  width: 5.1rem;
+  height: 1.6rem;
+}
+
+.shokz-cms .step-nav__home > span {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  max-width: none;
+}
+
+.shokz-cms .step-nav__home .shokz-wordmark {
+  width: 100%;
+  height: auto;
+}
+
+.shokz-cms .template-minimal.login {
+  min-height: 100dvh;
+  background: hsl(var(--background));
+}
+
+.shokz-cms .login > .template-minimal__wrap {
+  max-width: 400px;
+}
+
+.shokz-content-home {
+  max-width: 1040px;
+  margin-inline: auto;
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  container-type: inline-size;
+}
+
+.shokz-content-heading {
+  margin: 0 0 1.35rem;
+  font-size: clamp(1.75rem, 3.1vw, 2.35rem);
+  font-weight: 600;
+  line-height: 1.18;
+}
+
+.shokz-content-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shokz-content-shortcut,
+.shokz-content-shortcut:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.shokz-content-shortcut:hover [data-slot="card"] {
+  background: hsl(var(--muted));
+}
+
+.shokz-content-shortcut:focus-visible,
+.shokz-sidebar-brand:focus-visible {
+  outline: var(--accessibility-outline);
+  outline-offset: 3px;
+}
+
+.shokz-shortcut-count {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.shokz-cms .cms-list .list-header {
+  margin-block: 0;
+}
+
+.shokz-cms .cms-list-toolbar .search-bar {
+  --search-bg: hsl(var(--background));
+  min-height: 2.75rem;
+  border: 1px solid hsl(var(--input));
+}
+
+.shokz-cms .cms-list-toolbar .search-filter__input {
+  background: transparent;
+  color: hsl(var(--foreground));
+}
+
+.shokz-cms .cms-list-toolbar .search-bar:has(.search-filter__input:focus-visible) {
+  border-color: hsl(var(--ring));
+}
+
+.shokz-cms .cms-list-toolbar .search-bar__actions .pill {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+}
+
+.shokz-cms .cms-list-toolbar .search-bar__actions .pill:is(:hover, [aria-expanded="true"]) {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.shokz-cms .cms-list-toolbar .where-builder {
+  margin-block-start: 0.6rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: hsl(var(--background));
+}
+
+.shokz-cms .cms-list [data-slot="table"] :is(a, .sort-column__label) {
+  color: inherit;
+}
+
+.shokz-cms .cms-list [data-slot="table"] a:not(:hover) {
+  text-decoration: none;
+}
+
+.shokz-cms .where-builder__label {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Payload 的遮罩单独绘制模糊层，保留原生遮罩的交互层。 */
+.shokz-cms :is(
+  .confirmation-modal,
+  .delete-document,
+  .doc-controls,
+  .document-locked,
+  .document-stale-data,
+  .document-take-over,
+  .drawer__blur-bg,
+  .edit-many__document-actions,
+  .edit-many-bulk-uploads__document-actions,
+  .file-selections__filesContainer,
+  .file-selections__mobileBlur,
+  .restore-button,
+  .restore-many,
+  .restore-version__modal
+)::after {
+  content: none;
+}
+
+.shokz-cms .doc-controls::before {
+  background: hsl(var(--card));
+  opacity: 1;
+}
+
+@media (min-width: 769px) {
+  .shokz-cms {
+    --nav-width: 228px;
+    --gutter-h: clamp(1.6rem, 3.2vw, 3rem);
+  }
+
+  .shokz-cms .template-default__nav-toggler-wrapper:has(.nav-toggler--is-open) {
+    inset-inline-start: calc(var(--nav-width) - var(--gutter-h));
+  }
+}
+
+@container (max-width: 420px) {
+  .shokz-content-shortcuts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

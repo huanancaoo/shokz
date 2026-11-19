@@ -125,6 +125,7 @@ export interface Config {
   };
   locale: 'ko' | 'en' | 'zh';
   widgets: {
+    'content-overview': ContentOverviewWidget;
     collections: CollectionsWidget;
   };
   user: User | CommerceSync | PayloadMcpApiKey;
@@ -1702,6 +1703,16 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content-overview_widget".
+ */
+export interface ContentOverviewWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

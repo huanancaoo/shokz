@@ -37,7 +37,11 @@ function articleFields(): Field[] {
 export const Pages: CollectionConfig = {
   slug: "pages",
   labels: { singular: "页面", plural: "页面" },
-  admin: { group: "内容", useAsTitle: "title" },
+  admin: {
+    group: "内容",
+    useAsTitle: "title",
+    defaultColumns: ["title", "kind", "_status", "updatedAt"],
+  },
   access: staffAccess,
   versions,
   trash: true,
@@ -56,7 +60,11 @@ export const Pages: CollectionConfig = {
 export const Posts: CollectionConfig = {
   slug: "posts",
   labels: { singular: "博客", plural: "博客" },
-  admin: { group: "内容", useAsTitle: "title" },
+  admin: {
+    group: "内容",
+    useAsTitle: "title",
+    defaultColumns: ["title", "category", "_status", "updatedAt"],
+  },
   access: staffAccess,
   versions,
   trash: true,
@@ -78,7 +86,11 @@ export const Posts: CollectionConfig = {
 export const Banners: CollectionConfig = {
   slug: "banners",
   labels: { singular: "Banner", plural: "Banner" },
-  admin: { group: "内容", useAsTitle: "title" },
+  admin: {
+    group: "内容",
+    useAsTitle: "title",
+    defaultColumns: ["title", "format", "_status", "updatedAt"],
+  },
   access: staffAccess,
   versions,
   trash: true,
