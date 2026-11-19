@@ -47,5 +47,8 @@ export default defineConfig([
     "*.config.js",
     "check-env-variables.js",
     "next-sitemap.js",
+    "src/payload-types.ts",
+    "src/app/(payload)/admin/importMap.js",
+    "src/cms/migrations/**",
   ]),
 ])

@@ -20,16 +20,27 @@ import {
   DialogTrigger,
 } from "@modules/common/components/ui/dialog"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import home from "@/content/home.json"
+import type { Banner } from "@/payload-types"
 
-export default function Hero() {
+export type BannerSlide = Pick<
+  Banner,
+  "id" | "title" | "caption" | "format" | "eyebrow" | "headline" | "actionLabel"
+> & {
+  href?: string
+  desktopImage: string
+  mobileImage?: string
+  desktopVideo?: string
+  mobileVideo?: string
+}
+
+export default function Hero({ campaigns }: { campaigns: BannerSlide[] }) {
   const [active, setActive] = useState(0)
   const video = useRef<HTMLVideoElement>(null)
   const touch = useRef({ x: 0, y: 0 })
   const [playing, setPlaying] = useState(false)
   const [videoOpen, setVideoOpen] = useState(false)
   const [muted, setMuted] = useState(true)
-  const campaign = home.campaigns[active]
+  const campaign = campaigns[active]
 
   function selectCampaign(index: number) {
     if (index === active) return
@@ -39,10 +50,25 @@ export default function Hero() {
   }
 
   function navigate(direction: number) {
-    selectCampaign(
-      (active + direction + home.campaigns.length) % home.campaigns.length
-    )
+    selectCampaign((active + direction + campaigns.length) % campaigns.length)
   }
+
+  const campaignImage = (
+    <picture className="relative block h-full w-full">
+      <source media="(max-width: 767px)" srcSet={campaign.mobileImage} />
+      <Image
+        key={campaign.desktopImage}
+        src={campaign.desktopImage}
+        alt={campaign.title + " Shokz 브랜드 캠페인"}
+        fill
+        loading="eager"
+        fetchPriority={active === 0 ? "high" : "auto"}
+        quality={90}
+        sizes="100vw"
+        className="h-full w-full object-cover object-center motion-safe:animate-[campaign-enter_700ms_cubic-bezier(0.22,1,0.36,1)]"
+      />
+    </picture>
+  )
 
   return (
     <section
@@ -74,12 +100,12 @@ export default function Hero() {
       }}
     >
       <h1 className="sr-only">SHOKZ · 귀를 열고, 세상을 넓히다</h1>
-      {"video" in campaign.desktop ? (
+      {campaign.format === "video" ? (
         <div className="absolute inset-0">
           {/* 横幅在竖屏按高度裁切，按实际绘制宽度取图，避免人像被低分辨率放大。 */}
           <Image
-            src={campaign.poster}
-            alt="지창욱 Shokz 브랜드 캠페인"
+            src={campaign.desktopImage}
+            alt={campaign.title}
             fill
             sizes="(max-width: 767px) 1800px, 100vw"
             quality={90}
@@ -92,25 +118,25 @@ export default function Hero() {
           />
           <div className="absolute left-[8%] top-[39%] max-w-[75%] text-white md:top-[34%]">
             <p className="mb-4 text-[9px] font-semibold tracking-[0.18em] md:text-[11px]">
-              OPEN YOUR WORLD
+              {campaign.eyebrow}
             </p>
-            <h2 className="mb-6 text-[34px] font-semibold leading-[1.4] tracking-[-0.04em] [text-shadow:0_2px_18px_#0006] md:mb-8 md:text-[clamp(34px,4vw,62px)]">
-              나의 모든 순간에,
-              <br />
-              샥즈.
+            <h2 className="mb-6 whitespace-pre-line text-[34px] font-semibold leading-[1.4] tracking-[-0.04em] [text-shadow:0_2px_18px_#0006] md:mb-8 md:text-[clamp(34px,4vw,62px)]">
+              {campaign.headline}
             </h2>
-            <LocalizedClientLink
-              href={campaign.href}
-              className={buttonVariants({
-                size: "lg",
-                variant: "secondary",
-                className:
-                  "min-h-11 gap-4 bg-white px-5 text-xs hover:bg-[#ff813f] md:px-7 md:text-sm",
-              })}
-            >
-              샥즈 스쿼드 만나보기
-              <HugeiconsIcon icon={ArrowRight01Icon} data-icon="inline-end" />
-            </LocalizedClientLink>
+            {campaign.href && (
+              <LocalizedClientLink
+                href={campaign.href}
+                className={buttonVariants({
+                  size: "lg",
+                  variant: "secondary",
+                  className:
+                    "min-h-11 gap-4 bg-white px-5 text-xs hover:bg-[#ff813f] md:px-7 md:text-sm",
+                })}
+              >
+                {campaign.actionLabel}
+                <HugeiconsIcon icon={ArrowRight01Icon} data-icon="inline-end" />
+              </LocalizedClientLink>
+            )}
           </div>
           <Dialog
             open={videoOpen}
@@ -138,10 +164,10 @@ export default function Hero() {
             <DialogContent className="max-h-[92dvh] gap-0 overflow-hidden border border-[#3b4246] bg-[#11171b] p-0 text-white sm:max-w-[1100px]">
               <DialogHeader className="px-5 py-5 pr-14">
                 <DialogTitle className="text-sm font-medium tracking-[0.03em]">
-                  지창욱 × SHOKZ
+                  {campaign.title}
                 </DialogTitle>
                 <DialogDescription className="sr-only">
-                  오픈닷 2 공식 브랜드 영상
+                  {campaign.title} 브랜드 영상
                 </DialogDescription>
               </DialogHeader>
               {/* 品牌片包含字幕和产品画面，独立播放并完整保留原片构图。 */}
@@ -152,17 +178,17 @@ export default function Hero() {
                 muted={muted}
                 preload="metadata"
                 className="aspect-[32/45] max-h-[70dvh] w-full bg-black object-contain md:aspect-video"
-                aria-label="지창욱 × SHOKZ 공식 브랜드 영상"
+                aria-label={campaign.title + " 공식 브랜드 영상"}
                 onPlay={() => setPlaying(true)}
                 onPause={() => setPlaying(false)}
                 onEnded={() => setPlaying(false)}
               >
                 <source
-                  src={campaign.mobile.video}
+                  src={campaign.mobileVideo}
                   media="(max-width: 767px)"
                   type="video/mp4"
                 />
-                <source src={campaign.desktop.video} type="video/mp4" />
+                <source src={campaign.desktopVideo} type="video/mp4" />
               </video>
               <div className="flex items-center justify-between border-t border-[#343c41] px-4 py-2">
                 <Button
@@ -193,27 +219,16 @@ export default function Hero() {
             </DialogContent>
           </Dialog>
         </div>
-      ) : (
+      ) : campaign.href ? (
         <LocalizedClientLink
           href={campaign.href}
           className="campaign-image absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-5px] focus-visible:outline-[#ff813f]"
-          aria-label={campaign.title + " 제품 보기"}
+          aria-label={campaign.title + " 자세히 보기"}
         >
-          <picture className="relative block h-full w-full">
-            <source media="(max-width: 767px)" srcSet={campaign.mobile.image} />
-            <Image
-              key={campaign.poster}
-              src={campaign.desktop.image}
-              alt={campaign.title + " Shokz 브랜드 캠페인"}
-              fill
-              loading="eager"
-              fetchPriority={active === 0 ? "high" : "auto"}
-              quality={90}
-              sizes="100vw"
-              className="h-full w-full object-cover object-center motion-safe:animate-[campaign-enter_700ms_cubic-bezier(0.22,1,0.36,1)]"
-            />
-          </picture>
+          {campaignImage}
         </LocalizedClientLink>
+      ) : (
+        <div className="campaign-image absolute inset-0">{campaignImage}</div>
       )}
       <div className="content-container pointer-events-none absolute inset-x-0 bottom-4 flex items-center justify-between gap-2 text-white md:bottom-7 md:gap-6">
         <div
@@ -227,7 +242,7 @@ export default function Hero() {
           <span className="sr-only md:hidden">{campaign.title}</span>
           <div className="hidden gap-1 border-l border-white/60 pl-4 md:grid">
             <span className="hidden text-[10px] tracking-[0.1em] md:block">
-              {campaign.english_name}
+              {campaign.caption}
             </span>
             <small className="text-[9px] md:text-[11px]">
               {campaign.title}
@@ -238,11 +253,11 @@ export default function Hero() {
           className="pointer-events-auto flex shrink-0 items-center gap-1"
           aria-label="캠페인 선택"
         >
-          {home.campaigns.map((item, index) => (
+          {campaigns.map((item, index) => (
             <Button
               variant="ghost"
               size="sm"
-              key={item.title}
+              key={item.id}
               className="group h-11 w-9 rounded-none px-0 hover:bg-transparent focus-visible:ring-[#ff813f] md:w-11"
               aria-current={active === index ? "true" : undefined}
               aria-label={item.title + " 캠페인 보기"}

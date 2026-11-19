@@ -8,12 +8,16 @@ import { spawn, spawnSync, execFileSync } from "node:child_process"
 const root = fileURLToPath(new URL("../", import.meta.url))
 const stateDir = path.join(root, ".poc")
 const stateFile = path.join(stateDir, "processes.json")
+const payloadCompose = ["compose", "-f", "apps/storefront/compose.payload.yaml"]
 const apps = [
   { name: "backend", directory: "apps/backend", port: 9001, health: "/health" },
   { name: "storefront", directory: "apps/storefront", port: 8000, health: "/kr" },
 ]
 fs.mkdirSync(stateDir, { recursive: true })
-if (Number(process.versions.node.split(".")[0]) !== 24) throw new Error("请使用 Node.js 24 LTS。此电脑可用：PATH=/opt/homebrew/opt/node@24/bin:$PATH pnpm poc:start")
+const [nodeMajor, nodeMinor, nodePatch] = process.versions.node.split(".").map(Number)
+if (nodeMajor !== 24 || nodeMinor < 22 || (nodeMinor === 22 && nodePatch < 3)) {
+  throw new Error("请使用 Node.js 24.22.3 或更新的 Node.js 24 LTS")
+}
 
 function run(command, args, cwd = root, capture = false) {
   const result = spawnSync(command, args, { cwd, env: process.env, stdio: capture ? "pipe" : "inherit", encoding: "utf8", maxBuffer: 32 * 1024 * 1024 })
@@ -45,6 +49,7 @@ async function ready(app) {
 }
 async function start() {
   run("docker", ["compose", "up", "-d", "--wait"])
+  run("docker", [...payloadCompose, "up", "-d", "--wait"])
   const state = readState()
   for (const app of apps) {
     if (await portOpen(app.port)) {
@@ -74,6 +79,7 @@ function stop() {
 function initializeEnv() {
   const backend = path.join(root, "apps/backend/.env")
   const storefront = path.join(root, "apps/storefront/.env.local")
+  const payloadEnv = path.join(root, "apps/storefront/.env")
   if (!fs.existsSync(backend)) fs.writeFileSync(backend, [
     "DATABASE_URL=postgres://shokz:shokz_local_poc@localhost:5442/shokz",
     "STORE_CORS=http://localhost:8000",
@@ -90,16 +96,26 @@ function initializeEnv() {
     "NEXT_PUBLIC_DEFAULT_REGION=kr",
     "",
   ].join("\n"), { mode: 0o600 })
+  if (!fs.existsSync(payloadEnv)) {
+    const payloadEntries = fs.readFileSync(path.join(root, "apps/storefront/.env.template"), "utf8")
+      .split("\n")
+      .filter(line => /^(PAYLOAD_|CMS_)/.test(line))
+      .map(line => line === "PAYLOAD_SECRET=" ? "PAYLOAD_SECRET=" + crypto.randomBytes(32).toString("hex") : line)
+    fs.writeFileSync(payloadEnv, payloadEntries.join("\n") + "\n", { mode: 0o600 })
+  }
 }
 async function setup() {
   run("pnpm", ["install", "--frozen-lockfile"])
   initializeEnv()
   run("docker", ["compose", "up", "-d", "--wait"])
+  run("docker", [...payloadCompose, "up", "-d", "--wait"])
   const backendDir = path.join(root, "apps/backend")
   run("pnpm", ["exec", "medusa", "db:migrate", "--execute-all-links"], backendDir)
   const output = run("pnpm", ["exec", "medusa", "exec", "./src/scripts/seed-shokz.ts"], backendDir, true)
   if (output.includes("SHOKZ_DEMO_ADMIN_MISSING")) run("pnpm", ["exec", "medusa", "user", "-e", "admin@shokz.local", "-p", "ShokzPoc2026!"], backendDir)
-  console.log("初始化完成。运行 pnpm poc:start 启动商城。")
+  run("pnpm", ["--filter", "@dtc/storefront", "run", "cms:migrate"])
+  run("pnpm", ["--filter", "@dtc/storefront", "run", "cms:seed"])
+  console.log("初始化完成。运行 pnpm poc:start 启动商城和 Payload 后台。")
 }
 
 const action = process.argv[2]

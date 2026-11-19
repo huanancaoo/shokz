@@ -71,3 +71,4 @@ Thumbs.db
 
 # Import snapshots are local; runtime data and media are managed by Medusa.
 /apps/backend/data/
+/apps/storefront/data/

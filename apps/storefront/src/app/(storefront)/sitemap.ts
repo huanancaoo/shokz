@@ -1,4 +1,5 @@
 import { sdk } from "@lib/config"
+import { listCmsSitemapEntries } from "@lib/data/cms"
 import { listRegions } from "@lib/data/regions"
 import { getSiteOrigin, listCountryCodes } from "@lib/util/site"
 import type { MetadataRoute } from "next"
@@ -6,6 +7,7 @@ import type { MetadataRoute } from "next"
 const STATIC_PATHS = [
   "",
   "/store",
+  "/journal",
   "/shipping",
   "/returns",
   "/terms",
@@ -32,7 +34,7 @@ type Entry = { handle?: string | null; updated_at?: string | Date | null }
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const query = { fields: "handle,updated_at", limit: PAGE_SIZE }
 
-  const [origin, regions, products, categories, collections] =
+  const [origin, regions, products, categories, collections, content] =
     await Promise.all([
       getSiteOrigin(),
       listRegions(),
@@ -51,6 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .list({ ...query, offset })
           .then((res) => ({ items: res.collections, count: res.count }))
       ),
+      listCmsSitemapEntries(),
     ])
 
   const toEntries = (base: string, prefix: string, items: Entry[]) =>
@@ -68,6 +71,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...toEntries(base, "products", products),
       ...toEntries(base, "categories", categories),
       ...toEntries(base, "collections", collections),
+      ...content.map(({ path, updatedAt }) => ({
+        url: `${base}${path}`,
+        lastModified: updatedAt,
+      })),
     ]
   })
 }

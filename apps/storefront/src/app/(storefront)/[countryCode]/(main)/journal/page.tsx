@@ -1,4 +1,5 @@
-import articles from "../../../../content/articles.json"
+import { listCmsPosts } from "@lib/data/cms"
+import { cmsMediaURL } from "@/cms/media-url"
 import Image from "@modules/common/components/store-image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -10,9 +11,7 @@ export default async function Page({
   searchParams: Promise<{ category?: string }>
 }) {
   const { category } = await searchParams
-  const entries = category
-    ? articles.filter((article) => article.category === category)
-    : articles
+  const entries = await listCmsPosts({ category })
   return (
     <div className="journal-page content-container">
       <p className="eyebrow">STORIES THAT MOVE US</p>
@@ -40,30 +39,33 @@ export default async function Page({
         ))}
       </div>
       <div className="journal-grid">
-        {entries.map((article) => (
-          <LocalizedClientLink
-            href={`/journal/${article.slug}`}
-            key={article.slug}
-            className="journal-card"
-          >
-            {article.images[0] && (
-              <div className="journal-image">
-                <Image
-                  src={article.images[0]}
-                  alt={article.title}
-                  fill
-                  sizes="(max-width: 768px) 90vw, 33vw"
-                  loading="lazy"
-                />
-              </div>
-            )}
-            <span>{article.category.toUpperCase()}</span>
-            <h3>{article.title}</h3>
-            <p className="text-link">
-              이야기 읽기 <HugeiconsIcon icon={ArrowRight01Icon} />
-            </p>
-          </LocalizedClientLink>
-        ))}
+        {entries.map((article) => {
+          const photo = cmsMediaURL(article.photos?.[0])
+          return (
+            <LocalizedClientLink
+              href={`/journal/${article.slug}`}
+              key={article.slug}
+              className="journal-card"
+            >
+              {photo && (
+                <div className="journal-image">
+                  <Image
+                    src={photo}
+                    alt={article.title}
+                    fill
+                    sizes="(max-width: 768px) 90vw, 33vw"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <span>{article.category.toUpperCase()}</span>
+              <h3>{article.title}</h3>
+              <p className="text-link">
+                이야기 읽기 <HugeiconsIcon icon={ArrowRight01Icon} />
+              </p>
+            </LocalizedClientLink>
+          )
+        })}
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
-const path = require("node:path")
-const checkEnvVariables = require("./check-env-variables")
+import path from "node:path"
+import { withPayload } from "@payloadcms/next/withPayload"
+import checkEnvVariables from "./check-env-variables.js"
 
 checkEnvVariables()
 
@@ -21,7 +22,7 @@ const defaultCountryCode = (
 const nextConfig = {
   reactStrictMode: true,
   ...(selfHosted ? { output: "standalone", experimental: { cpus: 1 } } : {}),
-  outputFileTracingRoot: path.resolve(__dirname, "../.."),
+  outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
   env: { NEXT_PUBLIC_MEDUSA_MEDIA_ORIGIN: mediaOrigin.origin },
   async headers() {
     return [
@@ -95,4 +96,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+export default withPayload(nextConfig, { devBundleServerPackages: false })

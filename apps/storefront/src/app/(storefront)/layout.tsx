@@ -1,6 +1,6 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
-import "../styles/globals.css"
+import "@/styles/globals.css"
 import CompareProvider from "@lib/context/compare-context"
 
 export const metadata: Metadata = {

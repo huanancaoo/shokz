@@ -6,24 +6,35 @@ import { Button } from "@modules/common/components/ui/button"
 import { Input } from "@modules/common/components/ui/input"
 import { Label } from "@modules/common/components/ui/label"
 import { Textarea } from "@modules/common/components/ui/textarea"
+import ProductPreview from "@modules/products/components/product-preview"
+import CmsRichText from "@modules/common/components/cms-rich-text"
+import { listReferencedProducts } from "@lib/data/cms"
+import { cmsMediaURL } from "@/cms/media-url"
+import { relationID } from "@/cms/content-model"
+import type { Page, Post } from "@/payload-types"
 
-export type EditorialPage = {
-  slug: string
-  title: string
-  source_url: string
-  kind: string
-  images: string[]
-  paragraphs: string[]
-}
-
-export default function Editorial({ page }: { page: EditorialPage }) {
-  const display = ["display", "membership"].includes(page.kind)
+export default async function Editorial({
+  page,
+  countryCode,
+}: {
+  page: Page | Post
+  countryCode: string
+}) {
+  const kind = "kind" in page ? page.kind : "article"
+  const display = ["display", "membership"].includes(kind)
+  const photos = (page.photos ?? [])
+    .map(cmsMediaURL)
+    .filter((url): url is string => Boolean(url))
+  const productIDs = (page.products ?? [])
+    .map(relationID)
+    .filter((id): id is string => typeof id === "string")
+  const products = await listReferencedProducts(countryCode, productIDs)
   return (
     <article>
       <header className="editorial-hero">
         <div className="content-container">
           <p className="eyebrow">
-            SHOKZ · {page.kind === "article" ? "JOURNAL" : "OPEN YOUR WORLD"}
+            SHOKZ · {kind === "article" ? "JOURNAL" : "OPEN YOUR WORLD"}
           </p>
           <h1>{page.title}</h1>
         </div>
@@ -35,10 +46,10 @@ export default function Editorial({ page }: { page: EditorialPage }) {
             신청 및 개인정보 수집은 진행되지 않습니다.
           </p>
         )}
-        {page.images[0] && (
+        {photos[0] && (
           <Image
             className="editorial-main-image"
-            src={page.images[0]}
+            src={photos[0]}
             alt={page.title}
             width={1200}
             height={700}
@@ -46,15 +57,13 @@ export default function Editorial({ page }: { page: EditorialPage }) {
           />
         )}
         <div className="editorial-paragraphs">
-          {page.paragraphs.map((text, index) => (
-            <p key={index}>{text}</p>
-          ))}
+          <CmsRichText data={page.body} countryCode={countryCode} />
         </div>
-        {page.images.length > 1 && (
+        {photos.length > 1 && (
           <div className="editorial-gallery">
-            {page.images.slice(1).map((image) => (
+            {photos.slice(1).map((image, index) => (
               <Image
-                key={image}
+                key={`${image}-${index}`}
                 src={image}
                 alt={page.title}
                 width={800}
@@ -63,6 +72,18 @@ export default function Editorial({ page }: { page: EditorialPage }) {
               />
             ))}
           </div>
+        )}
+        {products.length > 0 && (
+          <section className="mt-12" aria-labelledby="editorial-products">
+            <h2 id="editorial-products" className="mb-5 text-xl font-semibold">
+              관련 제품
+            </h2>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+              {products.map((product) => (
+                <ProductPreview key={product.id} product={product} />
+              ))}
+            </div>
+          </section>
         )}
         {["registration", "business", "support"].includes(page.slug) && (
           <section className="display-form">

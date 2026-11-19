@@ -3,6 +3,8 @@ import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
 const publicUrl = process.env.MEDUSA_PUBLIC_URL ?? "http://localhost:9001"
+const catalogUrl = process.env.PAYLOAD_CATALOG_URL
+const catalogApiKey = process.env.PAYLOAD_CATALOG_API_KEY
 
 module.exports = defineConfig({
   projectConfig: {
@@ -17,6 +19,12 @@ module.exports = defineConfig({
     },
   },
   modules: [
+    ...(catalogUrl && catalogApiKey
+      ? [{
+          resolve: "./src/modules/payload-catalog",
+          options: { url: catalogUrl, apiKey: catalogApiKey },
+        }]
+      : []),
     {
       resolve: "@medusajs/medusa/file",
       options: {

@@ -65,7 +65,7 @@ The fastest way to get started is deploying with [Medusa Cloud](https://cloud.me
 
 > **Prerequisites:**
 >
-> - [Node.js](https://nodejs.org/) v22.22+
+> - [Node.js](https://nodejs.org/) v24.22.3+（24 LTS）
 > - [PostgreSQL](https://www.postgresql.org/) v15+
 > - [pnpm](https://pnpm.io/) v10+
 
@@ -110,6 +110,12 @@ pnpm medusa user -e admin@test.com -p supersecret
 cd apps/backend
 pnpm dev
 ```
+
+## Shokz 内容管理
+
+Storefront 内置 Payload CMS，后台入口为 `http://localhost:8000/admin`。博客、Banner 和内容页面在 Payload 发布。Medusa 提供商城商品、价格、库存和交易服务。
+
+Shokz 本地运行使用 `pnpm poc:setup` 和 `pnpm poc:start`。Payload 数据库、内容导入和商品同步的配置见 [内容管理说明](./apps/storefront/CMS.md)。
 
 7. Open the admin dashboard at `localhost:9000/app` and log in. Retrieve your publishable API key at Settings > Publishable API key.
 

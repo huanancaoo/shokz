@@ -19,6 +19,7 @@
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
+      "@payload-config": ["./src/payload.config.ts"],
       "@lib/*": [
         "./src/lib/*"
       ],
@@ -45,7 +46,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/app/.well-known/**/*.ts",
+    "src/app/(storefront)/.well-known/**/*.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

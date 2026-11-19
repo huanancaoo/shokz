@@ -1,6 +1,4 @@
-const path = require("path")
-
-module.exports = {
+export default {
   darkMode: "class",
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx}",

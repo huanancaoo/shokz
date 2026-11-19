@@ -4,14 +4,21 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
 import { listProducts } from "@lib/data/products"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Hero from "@modules/home/components/hero"
+import Hero, { type BannerSlide } from "@modules/home/components/hero"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import ProductFinder from "@modules/home/components/product-finder"
 import BenefitsCarousel from "@modules/home/components/benefits-carousel"
 import HomeExperience from "@modules/home/components/home-experience"
 import Squad from "@modules/home/components/squad"
 import home from "@/content/home.json"
-import articles from "@/content/articles.json"
+import {
+  cmsBannerLink,
+  listCmsBanners,
+  listCmsPosts,
+  listReferencedProducts,
+} from "@lib/data/cms"
+import { cmsMediaURL } from "@/cms/media-url"
+import { relationID } from "@/cms/content-model"
 
 export const metadata: Metadata = {
   title: "SHOKZ Korea | 귀를 열고, 세상을 넓히다",
@@ -33,16 +40,66 @@ export default async function Home({
   params: Promise<{ countryCode: string }>
 }) {
   const { countryCode } = await params
-  const {
-    response: { products },
-  } = await listProducts({
+  const [
+    {
+      response: { products },
+    },
+    articles,
+    banners,
+  ] = await Promise.all([
+    listProducts({
+      countryCode,
+      queryParams: { limit: 100, order: "created_at" },
+    }),
+    listCmsPosts({ limit: 3 }),
+    listCmsBanners(),
+  ])
+  const bannerProductIDs = [
+    ...new Set(
+      banners
+        .filter((banner) => banner.linkType === "product")
+        .map((banner) => relationID(banner.product))
+        .filter((id): id is string => typeof id === "string")
+    ),
+  ]
+  const bannerProducts = await listReferencedProducts(
     countryCode,
-    queryParams: { limit: 100, order: "created_at" },
+    bannerProductIDs
+  )
+  const handles = new Map(
+    bannerProducts.flatMap(({ id, handle }) =>
+      handle ? [[id, handle] as const] : []
+    )
+  )
+  const campaigns = banners.flatMap((banner): BannerSlide[] => {
+    const desktopImage = cmsMediaURL(banner.desktopImage)
+    if (!desktopImage) return []
+    return [
+      {
+        id: banner.id,
+        title: banner.title,
+        caption: banner.caption,
+        format: banner.format,
+        eyebrow: banner.eyebrow,
+        headline: banner.headline,
+        actionLabel: banner.actionLabel,
+        href: cmsBannerLink(banner, handles),
+        desktopImage,
+        mobileImage: cmsMediaURL(banner.mobileImage),
+        desktopVideo: cmsMediaURL(banner.desktopVideo),
+        mobileVideo: cmsMediaURL(banner.mobileVideo),
+      },
+    ]
   })
 
   return (
     <HomeExperience>
-      <Hero />
+      {campaigns.length > 0 && (
+        <Hero
+          key={campaigns.map(({ id }) => id).join(",")}
+          campaigns={campaigns}
+        />
+      )}
       <FeaturedProducts products={products} />
       <section
         className={benefitsThemeClassName}
@@ -242,41 +299,44 @@ export default async function Home({
           </LocalizedClientLink>
         </div>
         <div className="grid gap-8 md:grid-cols-3 md:gap-6">
-          {articles.slice(0, 3).map((article) => (
-            <LocalizedClientLink
-              href={"/journal/" + article.slug}
-              key={article.slug}
-              className="group flex min-w-0 flex-col border-b border-[#dedbd4] pb-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6008]"
-              data-reveal
-            >
-              {article.images[0] && (
-                <div className="relative mb-6 aspect-[1.4] overflow-hidden rounded-xl bg-[#f2f0ea]">
-                  <Image
-                    src={article.images[0]}
-                    alt={article.title}
-                    fill
-                    sizes="(max-width: 767px) 90vw, 30vw"
-                    loading="lazy"
-                    className="object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-[1.045] group-focus-visible:scale-[1.045]"
+          {articles.map((article) => {
+            const photo = cmsMediaURL(article.photos?.[0])
+            return (
+              <LocalizedClientLink
+                href={"/journal/" + article.slug}
+                key={article.slug}
+                className="group flex min-w-0 flex-col border-b border-[#dedbd4] pb-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6008]"
+                data-reveal
+              >
+                {photo && (
+                  <div className="relative mb-6 aspect-[1.4] overflow-hidden rounded-xl bg-[#f2f0ea]">
+                    <Image
+                      src={photo}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 767px) 90vw, 30vw"
+                      loading="lazy"
+                      className="object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-[1.045] group-focus-visible:scale-[1.045]"
+                    />
+                  </div>
+                )}
+                <span className="text-[10px] font-semibold tracking-[0.14em] text-[#a3400b]">
+                  {article.category.toUpperCase()}
+                </span>
+                <h3 className="mb-5 mt-3 text-lg font-semibold leading-[1.7] tracking-[-0.025em] md:text-xl">
+                  {article.title}
+                </h3>
+                <span className="mt-auto flex min-h-11 items-center justify-between text-xs font-medium">
+                  이야기 읽기
+                  <HugeiconsIcon
+                    icon={ArrowRight01Icon}
+                    size={19}
+                    className="transition-transform group-hover:translate-x-1"
                   />
-                </div>
-              )}
-              <span className="text-[10px] font-semibold tracking-[0.14em] text-[#a3400b]">
-                {article.category.toUpperCase()}
-              </span>
-              <h3 className="mb-5 mt-3 text-lg font-semibold leading-[1.7] tracking-[-0.025em] md:text-xl">
-                {article.title}
-              </h3>
-              <span className="mt-auto flex min-h-11 items-center justify-between text-xs font-medium">
-                이야기 읽기
-                <HugeiconsIcon
-                  icon={ArrowRight01Icon}
-                  size={19}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </span>
-            </LocalizedClientLink>
-          ))}
+                </span>
+              </LocalizedClientLink>
+            )
+          })}
         </div>
       </section>
     </HomeExperience>
