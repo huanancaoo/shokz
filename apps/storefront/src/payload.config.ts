@@ -42,6 +42,16 @@ if (!CMS_EMAIL_FROM || !CMS_SMTP_HOST || !CMS_SMTP_PORT) {
   )
 }
 
+const csrf: string[] = []
+if (process.env.NODE_ENV === "development") {
+  const previewURL = new URL(PAYLOAD_SERVER_URL)
+  if (previewURL.hostname === "localhost") {
+    // 本地登录预览使用独立的 Cookie 域，Payload 会校验写请求的 Origin。
+    previewURL.hostname = "preview.localhost"
+    csrf.push(previewURL.origin)
+  }
+}
+
 export default buildConfig({
   admin: {
     user: "users",
@@ -95,6 +105,7 @@ export default buildConfig({
   ],
   globals: [SiteSettings],
   cookiePrefix: "shokz-cms",
+  csrf,
   db: postgresAdapter({
     pool: { connectionString: PAYLOAD_DATABASE_URL },
     migrationDir: path.resolve("src/cms/migrations"),
