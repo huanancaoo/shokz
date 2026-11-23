@@ -1,18 +1,15 @@
+import { runRestJsonOperation, runRestOperation } from "@lib/ucp/agent"
 import { getCheckout, updateCheckout } from "@lib/ucp/operations"
-import { readJsonBody, toResponse } from "@lib/ucp/ucp"
+import { CHECKOUT } from "@lib/ucp/ucp"
 
 type Context = { params: Promise<{ id: string }> }
 
-export const GET = async (request: Request, { params }: Context) =>
-  toResponse(await getCheckout(request, (await params).id))
+export const GET = (request: Request, { params }: Context) =>
+  runRestOperation(request, CHECKOUT, async () =>
+    getCheckout(request, (await params).id)
+  )
 
-export const PUT = async (request: Request, { params }: Context) =>
-  toResponse(
-    await updateCheckout(
-      request,
-      (
-        await params
-      ).id,
-      (await readJsonBody(request)) ?? {}
-    )
+export const PUT = (request: Request, { params }: Context) =>
+  runRestJsonOperation(request, CHECKOUT, async (body) =>
+    updateCheckout(request, (await params).id, body)
   )

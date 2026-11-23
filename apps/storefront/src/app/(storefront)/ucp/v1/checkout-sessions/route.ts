@@ -1,11 +1,12 @@
+import { runRestJsonOperation, scopedIdempotencyKey } from "@lib/ucp/agent"
 import { createCheckout } from "@lib/ucp/operations"
-import { readJsonBody, toResponse } from "@lib/ucp/ucp"
+import { CHECKOUT } from "@lib/ucp/ucp"
 
-export const POST = async (request: Request) =>
-  toResponse(
-    await createCheckout(
+export const POST = (request: Request) =>
+  runRestJsonOperation(request, CHECKOUT, (body, profile) =>
+    createCheckout(
       request,
-      (await readJsonBody(request)) ?? {},
-      request.headers.get("idempotency-key")
+      body,
+      scopedIdempotencyKey(profile, request.headers.get("Idempotency-Key"))
     )
   )

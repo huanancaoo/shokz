@@ -1,5 +1,8 @@
+import { runRestJsonOperation } from "@lib/ucp/agent"
 import { lookupCatalog } from "@lib/ucp/operations"
-import { readJsonBody, toResponse } from "@lib/ucp/ucp"
+import { CATALOG_LOOKUP } from "@lib/ucp/ucp"
 
-export const POST = async (request: Request) =>
-  toResponse(await lookupCatalog(request, (await readJsonBody(request)) ?? {}))
+export const POST = (request: Request) =>
+  runRestJsonOperation(request, CATALOG_LOOKUP, (body) =>
+    lookupCatalog(request, body)
+  )

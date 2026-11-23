@@ -1,7 +1,11 @@
+import { runRestOperation } from "@lib/ucp/agent"
 import { cancelCheckout } from "@lib/ucp/operations"
-import { toResponse } from "@lib/ucp/ucp"
+import { CHECKOUT } from "@lib/ucp/ucp"
 
-export const POST = async (
+export const POST = (
   request: Request,
   { params }: { params: Promise<{ id: string }> }
-) => toResponse(await cancelCheckout(request, (await params).id))
+) =>
+  runRestOperation(request, CHECKOUT, async () =>
+    cancelCheckout(request, (await params).id)
+  )

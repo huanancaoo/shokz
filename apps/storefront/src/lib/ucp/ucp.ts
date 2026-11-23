@@ -4,6 +4,10 @@ import { HttpTypes } from "@medusajs/types"
 export const UCP_VERSION = "2026-08-25"
 export const UCP_REST_BASE_PATH = "/ucp/v1"
 export const UCP_MCP_PATH = "/ucp/mcp"
+export const CATALOG_SEARCH = "dev.ucp.shopping.catalog.search"
+export const CATALOG_LOOKUP = "dev.ucp.shopping.catalog.lookup"
+export const CART = "dev.ucp.shopping.cart"
+export const CHECKOUT = "dev.ucp.shopping.checkout"
 
 const capability = (path: string, schema: string) => ({
   spec: `https://ucp.dev/${UCP_VERSION}/specification/shopping/${path}`,
@@ -11,16 +15,10 @@ const capability = (path: string, schema: string) => ({
 })
 
 export const UCP_CAPABILITIES = {
-  "dev.ucp.shopping.catalog.search": capability(
-    "catalog/search",
-    "catalog_search"
-  ),
-  "dev.ucp.shopping.catalog.lookup": capability(
-    "catalog/lookup",
-    "catalog_lookup"
-  ),
-  "dev.ucp.shopping.cart": capability("cart", "cart"),
-  "dev.ucp.shopping.checkout": capability("checkout", "checkout"),
+  [CATALOG_SEARCH]: capability("catalog/search", "catalog_search"),
+  [CATALOG_LOOKUP]: capability("catalog/lookup", "catalog_lookup"),
+  [CART]: capability("cart", "cart"),
+  [CHECKOUT]: capability("checkout", "checkout"),
 } as const
 
 export type CapabilityName = keyof typeof UCP_CAPABILITIES
@@ -31,7 +29,7 @@ export const UCP_PRODUCT_FIELDS =
   "id,title,handle,description,thumbnail,*images,*options,*variants,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.calculated_price,*variants.options"
 
 export const UCP_CART_FIELDS =
-  "id,email,currency_code,region_id,completed_at,metadata,*items,+items.subtotal,+items.total,item_subtotal,discount_total,shipping_total,tax_total,total,*region.countries,*shipping_address"
+  "id,email,currency_code,region_id,completed_at,metadata,*items,+items.subtotal,+items.total,item_subtotal,discount_total,discount_tax_total,shipping_subtotal,tax_total,total,*region.countries,*shipping_address"
 
 const minorUnitDigits = (currency: string) =>
   new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions()
@@ -52,13 +50,14 @@ const toMoney = (amount: number | null | undefined, currencyCode: string) => ({
 export const ucpResult = (
   name: CapabilityName,
   body: Record<string, unknown>,
-  status = 200
+  status = 200,
+  outcome: "success" | "error" = "success"
 ): UcpResult => ({
   status,
   body: {
     ucp: {
       version: UCP_VERSION,
-      status: status < 400 ? "success" : "error",
+      status: outcome,
       capabilities: { [name]: [{ version: UCP_VERSION }] },
       ...(name === "dev.ucp.shopping.checkout" ? { payment_handlers: {} } : {}),
     },
@@ -84,7 +83,8 @@ export const ucpError = (
         },
       ],
     },
-    status
+    status,
+    "error"
   )
 
 export const toResponse = ({ status, body }: UcpResult) =>
@@ -114,46 +114,53 @@ export const toUcpProduct = (
   const variants = (product.variants ?? []).filter(
     (variant) => variant.calculated_price?.calculated_amount != null
   )
-  const amounts = variants.map((v) => v.calculated_price!.calculated_amount!)
+  if (!variants.length) return null
+
+  const description = { plain: product.description ?? "" }
+  const pricedVariants = variants.map((variant) => {
+    const available = isVariantInStock(variant)
+    const options = (variant.options ?? []).flatMap((value) => {
+      const name = optionTitles.get(value.option_id ?? "")
+      return name && value.value ? [{ name, label: value.value }] : []
+    })
+    return {
+      id: variant.id,
+      sku: variant.sku ?? undefined,
+      title: variant.title ?? product.title,
+      description,
+      url: `${productUrl}?v_id=${variant.id}`,
+      price: toMoney(variant.calculated_price!.calculated_amount, currencyCode),
+      availability: {
+        available,
+        status: available ? "in_stock" : "out_of_stock",
+      },
+      options,
+    }
+  })
+  const amounts = pricedVariants.map(({ price }) => price.amount)
 
   return {
     id: product.id,
     handle: product.handle,
     title: product.title,
-    description: product.description ?? "",
+    description,
     url: productUrl,
     media: (product.images ?? []).map((image) => ({
       type: "image",
       url: image.url,
       alt_text: product.title,
     })),
-    price_range: amounts.length
-      ? {
-          min: toMoney(Math.min(...amounts), currencyCode),
-          max: toMoney(Math.max(...amounts), currencyCode),
-        }
-      : undefined,
-    variants: variants.map((variant) => {
-      const available = isVariantInStock(variant)
-      return {
-        id: variant.id,
-        sku: variant.sku ?? undefined,
-        title: variant.title ?? product.title,
-        url: `${productUrl}?v_id=${variant.id}`,
-        price: toMoney(
-          variant.calculated_price!.calculated_amount,
-          currencyCode
-        ),
-        availability: {
-          available,
-          status: available ? "in_stock" : "out_of_stock",
-        },
-        options: (variant.options ?? []).map((value) => ({
-          name: optionTitles.get(value.option_id ?? "") ?? "",
-          value: value.value,
-        })),
-      }
-    }),
+    price_range: {
+      min: {
+        amount: Math.min(...amounts),
+        currency: currencyCode.toUpperCase(),
+      },
+      max: {
+        amount: Math.max(...amounts),
+        currency: currencyCode.toUpperCase(),
+      },
+    },
+    variants: pricedVariants,
   }
 }
 
@@ -177,22 +184,25 @@ export const toUcpLineItems = (cart: HttpTypes.StoreCart) =>
     ],
   }))
 
-export const toUcpTotals = (cart: HttpTypes.StoreCart) => [
-  {
-    type: "subtotal",
-    amount: toMinorUnits(cart.item_subtotal, cart.currency_code),
-  },
-  {
-    type: "discount",
-    amount: toMinorUnits(cart.discount_total, cart.currency_code),
-  },
-  {
-    type: "fulfillment",
-    amount: toMinorUnits(cart.shipping_total, cart.currency_code),
-  },
-  { type: "tax", amount: toMinorUnits(cart.tax_total, cart.currency_code) },
-  { type: "total", amount: toMinorUnits(cart.total, cart.currency_code) },
-]
+export const toUcpTotals = (cart: HttpTypes.StoreCart) => {
+  const { currency_code: currency } = cart
+  // Medusa's tax_total already reflects discounts. Use pre-tax components to reconcile to total.
+  const discount = toMinorUnits(
+    cart.discount_total - cart.discount_tax_total,
+    currency
+  )
+
+  return [
+    { type: "subtotal", amount: toMinorUnits(cart.item_subtotal, currency) },
+    ...(discount > 0 ? [{ type: "discount", amount: -discount }] : []),
+    {
+      type: "fulfillment",
+      amount: toMinorUnits(cart.shipping_subtotal, currency),
+    },
+    { type: "tax", amount: toMinorUnits(cart.tax_total, currency) },
+    { type: "total", amount: toMinorUnits(cart.total, currency) },
+  ]
+}
 
 const MAX_LINE_ITEMS = 50
 const MAX_QUANTITY = 100

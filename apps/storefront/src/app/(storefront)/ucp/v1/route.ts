@@ -12,8 +12,10 @@ export const GET = (request: Request) => {
     operations: [
       `POST ${base}/catalog/search`,
       `POST ${base}/catalog/lookup`,
-      `POST ${base}/cart`,
-      `GET|PUT|DELETE ${base}/cart/{id}`,
+      `POST ${base}/catalog/product`,
+      `POST ${base}/carts`,
+      `GET|PUT ${base}/carts/{id}`,
+      `POST ${base}/carts/{id}/cancel`,
       `POST ${base}/checkout-sessions`,
       `GET|PUT ${base}/checkout-sessions/{id}`,
       `POST ${base}/checkout-sessions/{id}/complete`,

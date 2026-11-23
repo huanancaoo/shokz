@@ -41,6 +41,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "graphql": "^16.8.1",
+    "ipaddr.js": "2.5.0",
     "lodash": "^4.17.21",
     "next": "16.4.6",
     "payload": "3.94.0",
@@ -50,7 +51,9 @@
     "react-dom": "19.2.9",
     "server-only": "^0.0.1",
     "sharp": "0.35.4",
-    "tailwind-merge": "^3.7.0"
+    "structured-headers": "2.1.1",
+    "tailwind-merge": "^3.7.0",
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

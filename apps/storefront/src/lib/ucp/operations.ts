@@ -6,6 +6,10 @@ import { getRequestOrigin } from "@lib/util/site"
 import {
   cartContinueUrl,
   cartCountryCode,
+  CART,
+  CATALOG_LOOKUP,
+  CATALOG_SEARCH,
+  CHECKOUT,
   parseLineItems,
   toUcpLineItems,
   toUcpProduct,
@@ -19,11 +23,6 @@ import {
 import { HttpTypes } from "@medusajs/types"
 
 type Input = Record<string, unknown>
-
-const CATALOG_SEARCH = "dev.ucp.shopping.catalog.search"
-const CATALOG_LOOKUP = "dev.ucp.shopping.catalog.lookup"
-const CART = "dev.ucp.shopping.cart"
-const CHECKOUT = "dev.ucp.shopping.checkout"
 
 const MAX_SEARCH_LIMIT = 50
 const MAX_LOOKUP_IDS = 50
@@ -44,7 +43,7 @@ const contextCountry = (input: Input) =>
 const unsupportedCountry = (name: Parameters<typeof ucpError>[0]) =>
   ucpError(
     name,
-    400,
+    200,
     "unsupported_country",
     "This store doesn't sell to that country"
   )
@@ -60,7 +59,7 @@ const invalidLineItems = (name: Parameters<typeof ucpError>[0]) =>
 const itemUnavailable = (name: Parameters<typeof ucpError>[0]) =>
   ucpError(
     name,
-    422,
+    200,
     "item_unavailable",
     "One or more items don't exist or can't be purchased"
   )
@@ -141,13 +140,14 @@ export const searchCatalog = async (
   const nextOffset = offset + products.length
 
   return ucpResult(CATALOG_SEARCH, {
-    products: products.map((product) =>
-      toUcpProduct(
+    products: products.flatMap((product) => {
+      const result = toUcpProduct(
         product,
         resolved.region.currency_code,
         `${base}/${product.handle}`
       )
-    ),
+      return result ? [result] : []
+    }),
     pagination: {
       has_next_page: nextOffset < count,
       cursor: nextOffset < count ? String(nextOffset) : undefined,
@@ -157,27 +157,14 @@ export const searchCatalog = async (
   })
 }
 
-export const lookupCatalog = async (
+const findCatalogProducts = async (
   request: Request,
-  input: Input
-): Promise<UcpResult> => {
-  const ids = Array.isArray(input.ids)
-    ? input.ids.filter(
-        (id): id is string => typeof id === "string" && id.length > 0
-      )
-    : []
-  if (!ids.length || ids.length > MAX_LOOKUP_IDS) {
-    return ucpError(
-      CATALOG_LOOKUP,
-      400,
-      "invalid_request",
-      `"ids" must contain 1-${MAX_LOOKUP_IDS} identifiers`
-    )
-  }
-
-  const resolved = await resolveRegion(contextCountry(input))
-  if (!resolved) return unsupportedCountry(CATALOG_LOOKUP)
-
+  ids: string[],
+  {
+    countryCode,
+    region,
+  }: NonNullable<Awaited<ReturnType<typeof resolveRegion>>>
+) => {
   const variantIds = ids.filter((id) => id.startsWith("variant_"))
   const handles = ids.filter(
     (id) => !id.startsWith("prod_") && !id.startsWith("variant_")
@@ -205,7 +192,7 @@ export const lookupCatalog = async (
     ])
   )
   const common = {
-    region_id: resolved.region.id,
+    region_id: region.id,
     fields: UCP_PRODUCT_FIELDS,
     limit: MAX_LOOKUP_IDS,
   }
@@ -224,30 +211,209 @@ export const lookupCatalog = async (
     result?.products.forEach((product) => products.set(product.id, product))
   }
 
-  const found = new Set<string>()
-  for (const product of Array.from(products.values())) {
-    found.add(product.id)
-    if (product.handle) found.add(product.handle)
-    product.variants?.forEach((variant) => found.add(variant.id))
+  const base = `${getRequestOrigin(request)}/${countryCode}/products`
+  return Array.from(products.values()).flatMap((product) => {
+    const result = toUcpProduct(
+      product,
+      region.currency_code,
+      `${base}/${product.handle}`
+    )
+    return result ? [result] : []
+  })
+}
+
+type CatalogProduct = NonNullable<ReturnType<typeof toUcpProduct>>
+type CatalogVariant = CatalogProduct["variants"][number]
+type OptionSelection = CatalogVariant["options"][number]
+
+const featuredVariant = (variants: CatalogVariant[]) =>
+  variants.find((variant) => variant.availability.available) ?? variants[0]
+
+export const lookupCatalog = async (
+  request: Request,
+  input: Input
+): Promise<UcpResult> => {
+  if (
+    !Array.isArray(input.ids) ||
+    !input.ids.length ||
+    input.ids.length > MAX_LOOKUP_IDS ||
+    !input.ids.every(
+      (id): id is string => typeof id === "string" && !!id.trim()
+    )
+  ) {
+    return ucpError(
+      CATALOG_LOOKUP,
+      400,
+      "invalid_request",
+      `"ids" must contain 1-${MAX_LOOKUP_IDS} identifiers`
+    )
   }
 
-  const base = `${getRequestOrigin(request)}/${resolved.countryCode}/products`
+  const resolved = await resolveRegion(contextCountry(input))
+  if (!resolved) return unsupportedCountry(CATALOG_LOOKUP)
 
+  const ids = Array.from(new Set(input.ids))
+  const found = new Set<string>()
+  const products = (await findCatalogProducts(request, ids, resolved)).flatMap(
+    (product) => {
+      const featured = featuredVariant(product.variants)
+      const variants = product.variants.flatMap((variant) => {
+        // An identifier resolves to one variant. Product IDs and handles resolve to the featured one.
+        const inputs = ids.flatMap((id) => {
+          if (id === variant.id) return [{ id, match: "exact" }]
+          if (
+            variant.id === featured.id &&
+            (id === product.id || id === product.handle)
+          ) {
+            return [{ id, match: "featured" }]
+          }
+          return []
+        })
+        inputs.forEach(({ id }) => found.add(id))
+        return inputs.length ? [{ ...variant, inputs }] : []
+      })
+      return variants.length ? [{ ...product, variants }] : []
+    }
+  )
   return ucpResult(CATALOG_LOOKUP, {
-    products: Array.from(products.values()).map((product) =>
-      toUcpProduct(
-        product,
-        resolved.region.currency_code,
-        `${base}/${product.handle}`
-      )
-    ),
+    products,
     messages: ids
       .filter((id) => !found.has(id))
       .map((id) => ({
         type: "info",
         code: "not_found",
-        content: `No product or variant found for "${id}"`,
+        content: id,
       })),
+  })
+}
+
+const matchesOptions = (
+  variant: CatalogVariant,
+  selections: OptionSelection[]
+) =>
+  selections.every(({ name, label }) =>
+    variant.options.some(
+      (option) => option.name === name && option.label === label
+    )
+  )
+
+const detailOptions = (
+  variants: CatalogVariant[],
+  selections: OptionSelection[]
+) => {
+  const valuesByName = new Map<string, Set<string>>()
+  variants.forEach(({ options }) =>
+    options.forEach(({ name, label }) => {
+      const values = valuesByName.get(name) ?? new Set<string>()
+      values.add(label)
+      valuesByName.set(name, values)
+    })
+  )
+  return Array.from(valuesByName, ([name, values]) => ({
+    name,
+    values: Array.from(values, (label) => {
+      const candidate = [
+        ...selections.filter((option) => option.name !== name),
+        { name, label },
+      ]
+      const matches = variants.filter((variant) =>
+        matchesOptions(variant, candidate)
+      )
+      return {
+        label,
+        exists: !!matches.length,
+        available: matches.some((variant) => variant.availability.available),
+      }
+    }),
+  }))
+}
+
+export const getProduct = async (
+  request: Request,
+  input: Input
+): Promise<UcpResult> => {
+  const id = asString(input.id)
+  if (!id)
+    return ucpError(CATALOG_LOOKUP, 400, "invalid_request", '"id" is required')
+
+  const resolved = await resolveRegion(contextCountry(input))
+  if (!resolved) return unsupportedCountry(CATALOG_LOOKUP)
+
+  const [product] = await findCatalogProducts(request, [id], resolved)
+  const requestedVariant = product?.variants.find(
+    (variant) => variant.id === id
+  )
+  if (
+    !product ||
+    (product.id !== id && product.handle !== id && !requestedVariant)
+  ) {
+    return ucpError(
+      CATALOG_LOOKUP,
+      200,
+      "not_found",
+      `No product or variant found for "${id}"`
+    )
+  }
+
+  const selected =
+    requestedVariant?.options ??
+    (Array.isArray(input.selected)
+      ? input.selected.map((value) => {
+          const option = asObject(value)
+          return { name: asString(option.name), label: asString(option.label) }
+        })
+      : undefined)
+  if (
+    selected?.some(({ name, label }) => !name || !label) ||
+    (selected &&
+      new Set(selected.map(({ name }) => name)).size !== selected.length)
+  ) {
+    return ucpError(
+      CATALOG_LOOKUP,
+      400,
+      "invalid_request",
+      '"selected" requires unique option names and labels'
+    )
+  }
+
+  let effective =
+    selected?.filter(
+      (option): option is OptionSelection => !!option.name && !!option.label
+    ) ?? featuredVariant(product.variants).options
+  if (!requestedVariant) {
+    const preferences = Array.isArray(input.preferences)
+      ? input.preferences
+      : []
+    const priority = (name: string) =>
+      preferences.includes(name)
+        ? preferences.indexOf(name)
+        : preferences.length
+    effective = [...effective].sort(
+      (a, b) => priority(a.name) - priority(b.name)
+    )
+    // Relax the lowest-priority selections until at least one variant matches.
+    while (
+      effective.length &&
+      !product.variants.some((variant) => matchesOptions(variant, effective))
+    ) {
+      effective.pop()
+    }
+  }
+  const matching = product.variants.filter((variant) =>
+    matchesOptions(variant, effective)
+  )
+  const featured = requestedVariant ?? featuredVariant(matching)
+
+  return ucpResult(CATALOG_LOOKUP, {
+    product: {
+      ...product,
+      selected: effective,
+      options: detailOptions(product.variants, effective),
+      variants: [
+        featured,
+        ...matching.filter((variant) => variant.id !== featured.id),
+      ],
+    },
   })
 }
 
@@ -308,7 +474,7 @@ const toUcpCartBody = (request: Request, cart: HttpTypes.StoreCart) => ({
   messages: [],
 })
 
-const cartNotFound = () => ucpError(CART, 404, "not_found", "Cart not found")
+const cartNotFound = () => ucpError(CART, 200, "not_found", "Cart not found")
 
 export const createCart = async (
   request: Request,
@@ -553,7 +719,7 @@ const toUcpCheckoutBody = async (
 }
 
 const checkoutNotFound = () =>
-  ucpError(CHECKOUT, 404, "not_found", "Checkout session not found")
+  ucpError(CHECKOUT, 200, "not_found", "Checkout session not found")
 
 export const createCheckout = async (
   request: Request,
@@ -565,7 +731,7 @@ export const createCheckout = async (
   let cartId = asString(input.cart_id)
   if (cartId) {
     if (!(await retrieveOpenCart(cartId))) {
-      return ucpError(CHECKOUT, 404, "not_found", "Cart not found")
+      return ucpError(CHECKOUT, 200, "not_found", "Cart not found")
     }
   } else {
     const items = parseLineItems(input.line_items)
