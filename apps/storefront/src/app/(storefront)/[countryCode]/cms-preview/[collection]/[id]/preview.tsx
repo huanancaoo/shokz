@@ -2,18 +2,21 @@
 
 import { useLivePreview } from "@payloadcms/live-preview-react"
 import Image from "next/image"
-import type { Banner, Page, Post } from "@/payload-types"
+import type { Banner, Post } from "@/payload-types"
 import { cmsMediaURL } from "@/cms/media-url"
 import CmsRichText from "@modules/common/components/cms-rich-text"
 
 export default function Preview({
   content,
+  countryCode,
   serverURL,
 }: {
-  content: Page | Post | Banner
+  content: Post | Banner
+  countryCode: string
   serverURL: string
 }) {
-  const { data } = useLivePreview({ initialData: content, depth: 2, serverURL })
+  const origin = typeof window === "undefined" ? serverURL : window.location.origin
+  const { data } = useLivePreview({ initialData: content, depth: 2, serverURL: origin })
   const image = cmsMediaURL(
     "desktopImage" in data ? data.desktopImage : data.photos?.[0]
   )
@@ -38,7 +41,7 @@ export default function Preview({
           />
         )
       )}
-      {"body" in data && <CmsRichText data={data.body} countryCode="kr" />}
+      {"body" in data && <CmsRichText data={data.body} countryCode={countryCode} />}
       {"headline" in data && <p>{data.headline}</p>}
     </article>
   )

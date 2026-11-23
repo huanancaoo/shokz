@@ -27,7 +27,7 @@ const LoginTemplate = () => {
 
   return (
     <section
-      className="mx-auto grid w-full max-w-[1180px] grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)] overflow-hidden rounded-2xl border border-[#dfddd6] bg-white max-[1000px]:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] max-[900px]:block max-[900px]:max-w-[540px] max-[480px]:rounded-none max-[480px]:border-0"
+      className="mx-auto grid w-full max-w-[1180px] grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)] overflow-hidden rounded-2xl border border-border bg-card max-[1000px]:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] max-[900px]:block max-[900px]:max-w-[540px] max-[480px]:rounded-none max-[480px]:border-0"
       aria-label="샥즈 계정"
     >
       <aside
@@ -68,7 +68,7 @@ const LoginTemplate = () => {
       >
         <LocalizedClientLink
           href="/store"
-          className="inline-flex min-h-10 items-center gap-2 self-start text-[11px] font-medium text-[#69645e] hover:text-[#b63e00] max-[480px]:min-h-9"
+          className="inline-flex min-h-10 items-center gap-2 self-start text-[11px] font-medium text-muted-foreground hover:text-accent-foreground max-[480px]:min-h-9"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={17} aria-hidden="true" />
           쇼핑 계속하기
@@ -83,18 +83,18 @@ const LoginTemplate = () => {
             <Register setCurrentView={setCurrentView} />
           )}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-[#e6e3dc] pt-5 max-[480px]:gap-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-border pt-5 max-[480px]:gap-2.5">
           <div>
-            <strong className="text-[11px] font-medium text-[#3b362f]">
+            <strong className="text-[11px] font-medium text-foreground">
               궁금한 점이 있으신가요?
             </strong>
-            <p className="mt-1.5 text-[10px] leading-[1.75] text-[#777168]">
+            <p className="mt-1.5 text-[10px] leading-[1.75] text-muted-foreground">
               자주 묻는 질문과 서비스 안내를 확인하세요.
             </p>
           </div>
           <LocalizedClientLink
             href="/pages/support"
-            className="inline-flex min-h-[38px] items-center gap-2 text-[11px] font-medium text-[#4b443b] hover:text-[#b63e00]"
+            className="inline-flex min-h-[38px] items-center gap-2 text-[11px] font-medium text-foreground hover:text-accent-foreground"
           >
             고객지원
             <HugeiconsIcon

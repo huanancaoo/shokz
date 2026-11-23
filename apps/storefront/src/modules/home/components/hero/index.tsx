@@ -130,7 +130,7 @@ export default function Hero({ campaigns }: { campaigns: BannerSlide[] }) {
                   size: "lg",
                   variant: "secondary",
                   className:
-                    "min-h-11 gap-4 bg-white px-5 text-xs hover:bg-[#ff813f] md:px-7 md:text-sm",
+                    "min-h-11 gap-4 bg-card px-5 text-xs hover:bg-primary/80 md:px-7 md:text-sm",
                 })}
               >
                 {campaign.actionLabel}
@@ -154,7 +154,7 @@ export default function Hero({ campaigns }: { campaigns: BannerSlide[] }) {
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="absolute right-5 top-[112px] h-11 w-11 rounded-full bg-white hover:bg-[#ff813f] md:right-[5vw] md:top-[145px] md:h-12 md:w-12"
+                  className="absolute right-5 top-[112px] h-11 w-11 rounded-full bg-card hover:bg-primary/80 md:right-[5vw] md:top-[145px] md:h-12 md:w-12"
                   aria-label="브랜드 영상 재생"
                 />
               }
@@ -258,16 +258,16 @@ export default function Hero({ campaigns }: { campaigns: BannerSlide[] }) {
               variant="ghost"
               size="sm"
               key={item.id}
-              className="group h-11 w-9 rounded-none px-0 hover:bg-transparent focus-visible:ring-[#ff813f] md:w-11"
+              className="group h-11 w-9 rounded-none px-0 hover:bg-transparent focus-visible:ring-ring md:w-11"
               aria-current={active === index ? "true" : undefined}
               aria-label={item.title + " 캠페인 보기"}
               onClick={() => selectCampaign(index)}
             >
               <span
                 className={cn(
-                  "h-[2px] transition-[width,background-color] duration-200 group-hover:bg-white",
+                  "h-[2px] transition-[width,background-color] duration-200 group-hover:bg-card",
                   active === index
-                    ? "w-6 bg-[#ff813f] md:w-8"
+                    ? "w-6 bg-primary/80 md:w-8"
                     : "w-3.5 bg-[#d2d9dc] md:w-5"
                 )}
               />
@@ -278,7 +278,7 @@ export default function Hero({ campaigns }: { campaigns: BannerSlide[] }) {
           <Button
             variant="secondary"
             size="icon"
-            className="h-11 w-11 rounded-full border border-white bg-white text-[#171717] transition-[background-color,transform] hover:-translate-y-0.5 hover:border-[#ff813f] hover:bg-[#ff813f] md:h-[50px] md:w-[50px]"
+            className="h-11 w-11 rounded-full border border-border bg-card text-foreground transition-[background-color,transform] hover:-translate-y-0.5 hover:border-[#ff813f] hover:bg-primary/80 md:h-[50px] md:w-[50px]"
             aria-label="이전 캠페인"
             onClick={() => navigate(-1)}
           >
@@ -287,7 +287,7 @@ export default function Hero({ campaigns }: { campaigns: BannerSlide[] }) {
           <Button
             variant="secondary"
             size="icon"
-            className="h-11 w-11 rounded-full border border-white bg-white text-[#171717] transition-[background-color,transform] hover:-translate-y-0.5 hover:border-[#ff813f] hover:bg-[#ff813f] md:h-[50px] md:w-[50px]"
+            className="h-11 w-11 rounded-full border border-border bg-card text-foreground transition-[background-color,transform] hover:-translate-y-0.5 hover:border-[#ff813f] hover:bg-primary/80 md:h-[50px] md:w-[50px]"
             aria-label="다음 캠페인"
             onClick={() => navigate(1)}
           >

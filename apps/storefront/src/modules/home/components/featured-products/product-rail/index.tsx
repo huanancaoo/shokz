@@ -50,7 +50,7 @@ export default function ProductRail({
         action={
           <LocalizedClientLink
             href="/store"
-            className="group inline-flex min-h-11 items-center gap-3 text-xs font-medium text-[#171717] hover:text-[#a1400c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6008] md:text-[13px]"
+            className="group inline-flex min-h-11 items-center gap-3 text-xs font-medium text-foreground hover:text-[#a1400c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:text-[13px]"
           >
             전체 제품 보기
             <HugeiconsIcon

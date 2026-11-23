@@ -22,9 +22,11 @@ import {
   useWindowInfo,
   ViewDescription,
 } from "@payloadcms/ui"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import type { ListViewClientProps } from "payload"
 import { formatAdminURL } from "payload/shared"
+import { buttonVariants } from "@modules/common/components/ui/button"
 import { Card } from "@modules/common/components/ui/card"
 import {
   Empty,
@@ -74,13 +76,25 @@ export function CmsListView({
   const inTrash = viewType === "trash"
   const canCreate = hasCreatePermission && allowCreate !== false
   const upload = collectionConfig.upload
-  const actions =
-    enableRowSelections && onBulkSelect
-      ? [
-          ...(beforeActions ?? []),
-          <SelectMany key="select-many" onClick={onBulkSelect} />,
-        ]
-      : beforeActions
+  const actions = [...(beforeActions ?? [])]
+  if (!isInDrawer && !inTrash && collectionConfig.folders && config.folders) {
+    actions.push(
+      <Link
+        key="folders"
+        className={buttonVariants({ size: "sm", variant: "outline" })}
+        href={formatAdminURL({
+          adminRoute: config.routes.admin,
+          path: `/collections/${collectionSlug}/${config.folders.slug}`,
+        })}
+        prefetch={false}
+      >
+        {t("folder:byFolder")}
+      </Link>
+    )
+  }
+  if (enableRowSelections && onBulkSelect) {
+    actions.push(<SelectMany key="select-many" onClick={onBulkSelect} />)
+  }
   const listURL = formatAdminURL({
     adminRoute: config.routes.admin,
     path: `/collections/${collectionSlug}`,

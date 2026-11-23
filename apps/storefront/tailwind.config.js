@@ -46,10 +46,17 @@ export default {
       },
       borderRadius: {
         none: "0px",
-        soft: "2px",
-        base: "4px",
-        rounded: "8px",
-        large: "16px",
+        soft: "calc(2px * var(--storefront-radius-scale, 1))",
+        sm: "calc(2px * var(--storefront-radius-scale, 1))",
+        DEFAULT: "calc(4px * var(--storefront-radius-scale, 1))",
+        base: "calc(4px * var(--storefront-radius-scale, 1))",
+        md: "calc(6px * var(--storefront-radius-scale, 1))",
+        lg: "calc(8px * var(--storefront-radius-scale, 1))",
+        rounded: "calc(8px * var(--storefront-radius-scale, 1))",
+        xl: "calc(12px * var(--storefront-radius-scale, 1))",
+        "2xl": "calc(16px * var(--storefront-radius-scale, 1))",
+        large: "calc(16px * var(--storefront-radius-scale, 1))",
+        "3xl": "calc(24px * var(--storefront-radius-scale, 1))",
         circle: "9999px",
       },
       maxWidth: {
@@ -68,16 +75,7 @@ export default {
         "3xl": "2rem",
       },
       fontFamily: {
-        sans: [
-          "Noto Sans KR",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Ubuntu",
-          "sans-serif",
-        ],
+        sans: "var(--storefront-font, sans-serif)",
       },
       keyframes: {
         ring: {

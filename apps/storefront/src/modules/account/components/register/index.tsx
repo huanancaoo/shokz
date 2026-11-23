@@ -21,22 +21,22 @@ const Register = ({ setCurrentView }: Props) => {
   return (
     <div className="w-full" data-testid="register-page">
       <div className="mb-[30px] max-[480px]:mb-[26px]">
-        <p className="mb-3 text-[10px] font-semibold tracking-[.17em] text-[#b64107]">
+        <p className="mb-3 text-[10px] font-semibold tracking-[.17em] text-accent-foreground">
           JOIN SHOKZ
         </p>
         <h1
-          className="mb-3 text-[clamp(26px,2.3vw,32px)] font-semibold leading-[1.4] tracking-[-1.25px] text-[#191917] focus:outline-none max-[480px]:text-[27px]"
+          className="mb-3 text-[clamp(26px,2.3vw,32px)] font-semibold leading-[1.4] tracking-[-1.25px] text-foreground focus:outline-none max-[480px]:text-[27px]"
           tabIndex={-1}
         >
           샥즈 계정 만들기
         </h1>
-        <p className="max-w-[365px] text-[13px] leading-[1.85] text-[#6c675f]">
+        <p className="max-w-[365px] text-[13px] leading-[1.85] text-muted-foreground">
           샥즈 계정으로 주문 내역과 배송지를 편리하게 관리하세요.
         </p>
       </div>
       {message?.state === "verification_required" && (
         <div
-          className="mb-[22px] break-words border-l-[3px] border-[#cf4c09] bg-[#fff0e5] px-4 py-3.5 text-xs leading-[1.85] text-[#743814]"
+          className="mb-[22px] break-words border-l-[3px] border-primary bg-accent px-4 py-3.5 text-xs leading-[1.85] text-accent-foreground"
           role="status"
           data-testid="register-verification-message"
         >
@@ -52,7 +52,7 @@ const Register = ({ setCurrentView }: Props) => {
               name="first_name"
               required
               autoComplete="given-name"
-              className="h-12 border-[#c9c5bf] text-sm focus-visible:border-[#c34400] focus-visible:ring-[#ff6008]/10 max-md:text-base"
+              className="h-12 border-input text-sm focus-visible:border-primary focus-visible:ring-ring/10 max-md:text-base"
               data-testid="first-name-input"
             />
             <Input
@@ -60,7 +60,7 @@ const Register = ({ setCurrentView }: Props) => {
               name="last_name"
               required
               autoComplete="family-name"
-              className="h-12 border-[#c9c5bf] text-sm focus-visible:border-[#c34400] focus-visible:ring-[#ff6008]/10 max-md:text-base"
+              className="h-12 border-input text-sm focus-visible:border-primary focus-visible:ring-ring/10 max-md:text-base"
               data-testid="last-name-input"
             />
           </div>
@@ -71,7 +71,7 @@ const Register = ({ setCurrentView }: Props) => {
             type="email"
             autoComplete="email"
             placeholder="name@example.com"
-            className="h-12 border-[#c9c5bf] text-sm placeholder:text-[#878079] focus-visible:border-[#c34400] focus-visible:ring-[#ff6008]/10 max-md:text-base"
+            className="h-12 border-input text-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-ring/10 max-md:text-base"
             data-testid="email-input"
           />
           <Input
@@ -79,7 +79,7 @@ const Register = ({ setCurrentView }: Props) => {
             name="phone"
             type="tel"
             autoComplete="tel"
-            className="h-12 border-[#c9c5bf] text-sm focus-visible:border-[#c34400] focus-visible:ring-[#ff6008]/10 max-md:text-base"
+            className="h-12 border-input text-sm focus-visible:border-primary focus-visible:ring-ring/10 max-md:text-base"
             data-testid="phone-input"
           />
           <Input
@@ -99,7 +99,7 @@ const Register = ({ setCurrentView }: Props) => {
             <ErrorMessage error={message.error} data-testid="register-error" />
           </div>
         )}
-        <p className="mt-5 text-[11px] leading-[1.9] text-[#6c675f] [&_a]:text-[#35312b] [&_a]:underline [&_a]:underline-offset-[3px]">
+        <p className="mt-5 text-[11px] leading-[1.9] text-muted-foreground [&_a]:text-foreground [&_a]:underline [&_a]:underline-offset-[3px]">
           회원가입 시 다음 정책에 동의합니다:{" "}
           <LocalizedClientLink href="/pages/privacy">
             개인정보처리방침
@@ -111,7 +111,7 @@ const Register = ({ setCurrentView }: Props) => {
           .
         </p>
         <SubmitButton
-          className="mt-[26px] h-[50px] min-h-[50px] w-full justify-between gap-3.5 rounded-[9px] border border-[#ff6008] bg-[#ff6008] px-[18px] text-sm font-semibold text-[#171717] shadow-none transition-[background,transform] hover:-translate-y-px hover:border-[#ed5700] hover:bg-[#ed5700] active:translate-y-0 disabled:translate-y-0 disabled:border-[#e8e4dc] disabled:bg-[#e8e4dc] disabled:text-[#77726a] disabled:opacity-100 motion-reduce:transform-none motion-reduce:transition-none"
+          className="mt-[26px] h-[50px] min-h-[50px] w-full justify-between gap-3.5 rounded-[calc(9px*var(--storefront-radius-scale))] border border-primary bg-primary px-[18px] text-sm font-semibold text-primary-foreground shadow-none transition-[background,transform] hover:-translate-y-px hover:border-[#ed5700] hover:bg-[#ed5700] active:translate-y-0 disabled:translate-y-0 disabled:border-[#e8e4dc] disabled:bg-[#e8e4dc] disabled:text-[#77726a] disabled:opacity-100 motion-reduce:transform-none motion-reduce:transition-none"
           data-testid="register-button"
         >
           가입하기
@@ -123,13 +123,13 @@ const Register = ({ setCurrentView }: Props) => {
           />
         </SubmitButton>
       </form>
-      <div className="mt-[26px] flex flex-wrap items-center justify-between gap-3 border-t border-[#e6e3dc] pt-[22px] text-xs">
-        <span className="text-[#6c675f]">이미 계정이 있으신가요?</span>
+      <div className="mt-[26px] flex flex-wrap items-center justify-between gap-3 border-t border-border pt-[22px] text-xs">
+        <span className="text-muted-foreground">이미 계정이 있으신가요?</span>
         <Button
           type="button"
           variant="ghost"
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-          className="h-auto min-h-[38px] gap-[9px] rounded-none p-0 text-xs font-semibold text-[#a23a08] hover:bg-transparent hover:text-[#171717]"
+          className="h-auto min-h-[38px] gap-[9px] rounded-none p-0 text-xs font-semibold text-accent-foreground hover:bg-transparent hover:text-foreground"
         >
           로그인
           <HugeiconsIcon icon={ArrowRight01Icon} size={17} aria-hidden="true" />

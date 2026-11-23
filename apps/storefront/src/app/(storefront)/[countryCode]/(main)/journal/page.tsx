@@ -1,21 +1,38 @@
-import { listCmsPosts } from "@lib/data/cms"
-import { cmsMediaURL } from "@/cms/media-url"
-import Image from "@modules/common/components/store-image"
+import { listCmsCategories, listCmsPosts } from "@lib/data/cms"
+import { relationID } from "@/cms/content-model"
+import JournalCard from "@modules/common/components/journal-card"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
+
 export const metadata = { title: "샥즈 소식 & 이벤트 | SHOKZ Korea" }
+
 export default async function Page({
+  params,
   searchParams,
 }: {
+  params: Promise<{ countryCode: string }>
   searchParams: Promise<{ category?: string }>
 }) {
-  const { category } = await searchParams
-  const entries = await listCmsPosts({ category })
+  const [{ countryCode }, { category }, categories] = await Promise.all([
+    params,
+    searchParams,
+    listCmsCategories(),
+  ])
+  const selected = categories.find(({ slug }) => slug === category)
+  const categoryIDs = category
+    ? categories.filter((item) => selected && (
+        item.id === selected.id ||
+        item.breadcrumbs?.some(({ doc }) => relationID(doc) === selected.id)
+      )).map(({ id }) => id)
+    : undefined
+  const entries = await listCmsPosts({ categories: categoryIDs })
+
   return (
     <div className="journal-page content-container">
       <p className="eyebrow">STORIES THAT MOVE US</p>
       <h1>샥즈의 새로운 이야기.</h1>
+      <LocalizedClientLink href="/content-search" className="text-link">
+        콘텐츠 검색
+      </LocalizedClientLink>
       <div className="category-pills">
         <LocalizedClientLink
           href="/journal"
@@ -23,49 +40,21 @@ export default async function Page({
         >
           전체 소식
         </LocalizedClientLink>
-        {[
-          ["news", "브랜드 뉴스"],
-          ["guide", "오픈이어 가이드"],
-          ["event", "이벤트"],
-          ["notify", "공지사항"],
-        ].map(([key, name]) => (
+        {categories.filter(({ visibleInJournal }) => visibleInJournal).map(({ id, slug, title }) => (
           <LocalizedClientLink
-            key={key}
-            href={`/journal?category=${key}`}
-            className={category === key ? "active" : ""}
+            key={id}
+            href={`/journal?category=${encodeURIComponent(slug)}`}
+            className={category === slug ? "active" : ""}
           >
-            {name}
+            {title}
           </LocalizedClientLink>
         ))}
       </div>
       <div className="journal-grid">
-        {entries.map((article) => {
-          const photo = cmsMediaURL(article.photos?.[0])
-          return (
-            <LocalizedClientLink
-              href={`/journal/${article.slug}`}
-              key={article.slug}
-              className="journal-card"
-            >
-              {photo && (
-                <div className="journal-image">
-                  <Image
-                    src={photo}
-                    alt={article.title}
-                    fill
-                    sizes="(max-width: 768px) 90vw, 33vw"
-                    loading="lazy"
-                  />
-                </div>
-              )}
-              <span>{article.category.toUpperCase()}</span>
-              <h3>{article.title}</h3>
-              <p className="text-link">
-                이야기 읽기 <HugeiconsIcon icon={ArrowRight01Icon} />
-              </p>
-            </LocalizedClientLink>
-          )
-        })}
+        {entries.map((article) => (
+          <JournalCard key={article.slug} article={article} countryCode={countryCode} />
+        ))}
+        {entries.length === 0 && <p className="text-muted-foreground">게시된 소식이 없습니다.</p>}
       </div>
     </div>
   )

@@ -8,7 +8,8 @@ import { searchPlugin } from "@payloadcms/plugin-search"
 import { seoPlugin } from "@payloadcms/plugin-seo"
 import type { CollectionConfig } from "payload"
 import { adminAccess, isAdmin, isStaff } from "./access"
-import { contentCollections } from "./content-model"
+import { contentCollections, editorialPath } from "./content-model"
+import { searchFields, syncContentSearch } from "./search"
 
 function privateTransferFiles({
   collection,
@@ -32,9 +33,10 @@ function privateTransferFiles({
 
 export const cmsPlugins = [
   nestedDocsPlugin({
-    collections: ["pages"],
+    collections: ["pages", "categories"],
     generateLabel: (_docs, doc) => String(doc.title ?? ""),
-    generateURL: (docs) => `/pages/${docs.map((doc) => doc.slug).join("/")}`,
+    generateURL: (docs, _doc, { slug }) =>
+      `${slug === "pages" ? "/pages" : ""}/${docs.map((doc) => doc.slug).join("/")}`,
   }),
   redirectsPlugin({
     collections: ["pages", "posts"],
@@ -45,14 +47,32 @@ export const cmsPlugins = [
   seoPlugin({
     collections: ["pages", "posts"],
     uploadsCollection: "media",
-    generateTitle: ({ doc }) => `${doc.title} | SHOKZ Korea`,
+    tabbedUI: true,
+    generateTitle: ({ doc }) => doc?.title ? `${doc.title} | SHOKZ Korea` : "SHOKZ Korea",
+    generateURL: ({ collectionConfig, doc, req }) => {
+      const collection = collectionConfig?.slug
+      if (collection !== "pages" && collection !== "posts") return ""
+      const path = editorialPath(collection, doc)
+      if (!path) return ""
+
+      const country = (process.env.NEXT_PUBLIC_DEFAULT_REGION || "kr").toLowerCase()
+      const origin = process.env.NEXT_PUBLIC_BASE_URL || req.payload.config.serverURL
+      return new URL(`/${country}${path}`, origin).href
+    },
   }),
   searchPlugin({
     collections: ["pages", "posts"],
     localize: true,
+    beforeSync: syncContentSearch,
     searchOverrides: {
       access: { read: isStaff, update: isAdmin, delete: isAdmin },
       admin: { group: "内容" },
+      fields: ({ defaultFields }) => [
+        ...defaultFields.map((field) => field.type === "relationship" && field.name === "doc"
+          ? { ...field, maxDepth: 1 }
+          : field),
+        ...searchFields,
+      ],
     },
   }),
   formBuilderPlugin({

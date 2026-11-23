@@ -33,7 +33,7 @@ import {
 } from "@modules/common/components/ui/dialog"
 
 const thumbnailClassName =
-  "relative aspect-square h-auto min-w-0 w-full rounded-lg border border-border bg-[var(--shokz-soft)] p-1 transition-colors hover:border-foreground/40 hover:bg-muted aria-[current=true]:border-primary aria-[current=true]:ring-1 aria-[current=true]:ring-inset aria-[current=true]:ring-primary focus-visible:ring-inset motion-reduce:transition-none"
+  "relative aspect-square h-auto min-w-0 w-full rounded-lg border border-border bg-muted p-1 transition-colors hover:border-foreground/40 hover:bg-muted aria-[current=true]:border-primary aria-[current=true]:ring-1 aria-[current=true]:ring-inset aria-[current=true]:ring-primary focus-visible:ring-inset motion-reduce:transition-none"
 
 export default function ImageGallery({
   images,
@@ -102,7 +102,7 @@ export default function ImageGallery({
         id={galleryId}
         aria-label="제품 갤러리"
         tabIndex={total > 1 ? 0 : undefined}
-        className="overflow-hidden rounded-2xl bg-[var(--shokz-soft)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset md:rounded-3xl"
+        className="overflow-hidden rounded-2xl bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset md:rounded-3xl"
       >
         <CarouselContent className="ml-0 touch-pan-y touch-pinch-zoom">
           {images.map((image, index) => (

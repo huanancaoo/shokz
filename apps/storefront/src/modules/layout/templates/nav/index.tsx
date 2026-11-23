@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "@modules/common/components/store-image"
-import branding from "@/content/branding.json"
+import Image from "next/image"
 import { useParams, usePathname } from "next/navigation"
+import type { getStorefrontHeader } from "@lib/data/cms"
 import { useCompare } from "@lib/context/compare-context"
 import { cn } from "@lib/utils"
 import type { HttpTypes } from "@medusajs/types"
@@ -38,66 +38,25 @@ import {
   AccordionContent,
 } from "@modules/common/components/ui/accordion"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-
-const links = [
-  {
-    title: "기술",
-    href: "/pages/technology",
-    children: [
-      ["골전도 기술", "bone-conduction-technology"],
-      ["Shokz OpenSound", "shokz-opensound"],
-      ["오픈이어 오디오", "open-ear-audio-technology"],
-      ["컴포트 기술", "comfort-tech"],
-      ["스포츠 기술", "sports-tech"],
-    ],
-  },
-  {
-    title: "샥즈 스쿼드",
-    href: "/pages/ambassador",
-    children: [
-      ["앰버서더", "ambassador"],
-      ["애슬리트", "athletes"],
-    ],
-  },
-  {
-    title: "브랜드 스토리",
-    href: "/pages/open-ear-guide",
-    children: [
-      ["오픈이어란", "open-ear-guide"],
-      ["일상 속 오픈이어", "lifestyle-guide"],
-      ["러닝과 함께", "running-guide"],
-    ],
-  },
-  { title: "멤버십", href: "/pages/membership", children: [] },
-  {
-    title: "고객지원",
-    href: "/pages/support",
-    children: [
-      ["A/S 안내", "support"],
-      ["자주 묻는 질문", "faq"],
-      ["매장 찾기", "stores"],
-      ["사용 후기", "reviews"],
-      ["정품 등록", "registration"],
-      ["비즈니스", "business"],
-    ],
-  },
-]
+import StorefrontContentLink from "@modules/layout/components/storefront-content-link"
 
 const navItemMotion =
-  "relative h-12 gap-1.5 px-2.5 text-sm font-medium transition-colors duration-150 ease-out after:absolute after:inset-x-2.5 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-[var(--shokz-orange)] after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-expanded:after:scale-x-100 min-[1440px]:px-3 motion-reduce:transition-none motion-reduce:after:transition-none"
+  "relative h-12 gap-1.5 px-2.5 text-sm font-medium transition-colors duration-150 ease-out after:absolute after:inset-x-2.5 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-primary after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-expanded:after:scale-x-100 min-[1440px]:px-3 motion-reduce:transition-none motion-reduce:after:transition-none"
 
 const headerToolIconClassName = "size-5 min-[1201px]:size-[22px]"
 
 const navLinkMotion =
-  "group/nav-link rounded-md outline-none transition-[color,background-color] duration-150 ease-out hover:bg-[#f5f3ef] focus-visible:bg-[#f5f3ef] focus-visible:text-[#c64800] motion-reduce:transition-none"
+  "group/nav-link rounded-md outline-none transition-[color,background-color] duration-150 ease-out hover:bg-muted focus-visible:bg-muted focus-visible:text-accent-foreground motion-reduce:transition-none"
 
 const sheetMotion =
   "transition-[transform,opacity] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-[ending-style]:duration-150 data-[ending-style]:ease-in motion-reduce:!transform-none motion-reduce:transition-none [&_[data-slot=sheet-close]]:transition-colors [&_[data-slot=sheet-close]]:duration-150 [&_[data-slot=sheet-close]]:motion-reduce:transition-none"
 
 export default function Nav({
+  settings,
   categories,
   cart,
 }: {
+  settings: Awaited<ReturnType<typeof getStorefrontHeader>>
   categories: HttpTypes.StoreProductCategory[]
   cart: React.ReactNode
 }) {
@@ -113,24 +72,32 @@ export default function Nav({
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [panel, setPanel] = useState<"menu" | "search" | null>(null)
   const { countryCode = "kr" } = useParams()
+  const { catalog, logoURL, mobileSubtitle } = settings
   const navigation = [
     {
-      title: "제품",
+      id: "catalog",
+      label: catalog.label,
+      mobileLabel: null,
       href: "/store",
+      newTab: false,
       children: [
-        ...categories.map((category) => [
-          category.name,
-          `/categories/${category.handle}`,
-        ]),
-        [
-          "제품 비교하기",
-          "/compare" + (handles.length ? "?products=" + handles.join(",") : ""),
-        ],
+        ...categories.map(({ id, name, handle }) => ({
+          id,
+          label: name,
+          href: `/categories/${handle}`,
+          newTab: false,
+        })),
+        {
+          id: "compare",
+          label: catalog.compareLabel,
+          href: "/compare" + (handles.length ? "?products=" + handles.join(",") : ""),
+          newTab: false,
+        },
       ],
     },
-    ...links.map((link) => ({
+    ...settings.navigation.map((link) => ({
       ...link,
-      children: link.children.map(([title, slug]) => [title, `/pages/${slug}`]),
+      id: link.id ?? link.href,
     })),
   ]
   return (
@@ -148,7 +115,7 @@ export default function Nav({
         <span>세상과 연결되는 사운드, 샥즈.</span>
         <LocalizedClientLink
           href="/pages/membership"
-          className="group/announcement rounded-sm outline-none transition-colors duration-150 hover:text-[#ff8b52] focus-visible:ring-2 focus-visible:ring-[#ff8b52] motion-reduce:transition-none"
+          className="group/announcement rounded-sm outline-none transition-colors duration-150 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
         >
           멤버십 알아보기
           <HugeiconsIcon
@@ -183,17 +150,16 @@ export default function Nav({
         </Button>
         <LocalizedClientLink
           href="/"
-          className="relative mr-auto block aspect-[57/23] w-14 shrink-0 overflow-hidden rounded-sm transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c64800] md:w-[68px] min-[1201px]:mr-0 min-[1201px]:w-[76px] motion-reduce:transition-none"
+          className="relative mr-auto block aspect-[57/23] w-14 shrink-0 rounded-sm transition-opacity duration-150 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c64800] md:w-[68px] min-[1201px]:mr-0 min-[1201px]:w-[76px] motion-reduce:transition-none"
           aria-label="Shokz 홈"
         >
-          {/* 原图两侧有透明留白；等比放大后只裁掉留白，使可见标识对齐左侧内容。 */}
           <Image
-            src={branding.logo}
+            src={logoURL}
             alt="SHOKZ"
             fill
-            sizes="(min-width: 1201px) 126px, (min-width: 768px) 113px, 93px"
+            unoptimized
             preload
-            className="scale-[1.65] object-contain invert"
+            className="object-contain brightness-0 dark:invert"
           />
         </LocalizedClientLink>
         <nav
@@ -203,12 +169,12 @@ export default function Nav({
           {navigation.map((link) =>
             link.children.length ? (
               <Popover
-                key={link.title}
-                open={openMenu === link.title}
+                key={link.id}
+                open={openMenu === link.id}
                 onOpenChange={(open) => {
                   // 切换菜单时，旧菜单的关闭回调不能覆盖新菜单的展开状态。
                   setOpenMenu((current) =>
-                    open ? link.title : current === link.title ? null : current
+                    open ? link.id : current === link.id ? null : current
                   )
                 }}
               >
@@ -221,7 +187,7 @@ export default function Nav({
                     />
                   }
                 >
-                  {link.title}
+                  {link.label}
                   <HugeiconsIcon
                     icon={ArrowDown01Icon}
                     data-icon="inline-end"
@@ -233,60 +199,54 @@ export default function Nav({
                   sideOffset={24}
                   className="nav-menu-content transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-[open]:animate-none data-[closed]:animate-none data-[starting-style]:-translate-y-1.5 data-[starting-style]:opacity-0 data-[ending-style]:-translate-y-1 data-[ending-style]:opacity-0 data-[ending-style]:duration-150 data-[ending-style]:ease-in motion-reduce:!transform-none motion-reduce:transition-none"
                 >
-                  <LocalizedClientLink
+                  <StorefrontContentLink
                     href={link.href}
+                    newTab={link.newTab}
                     className={cn("nav-panel-title", navLinkMotion)}
                     onClick={() => setOpenMenu(null)}
                   >
-                    {link.title} 알아보기
+                    {link.label} 알아보기
                     <HugeiconsIcon
                       icon={ArrowRight01Icon}
                       size={18}
                       className="transition-transform duration-150 ease-out group-hover/nav-link:translate-x-0.5 group-focus-visible/nav-link:translate-x-0.5 motion-reduce:!transform-none motion-reduce:transition-none"
                     />
-                  </LocalizedClientLink>
-                  {link.children.map(([title, href]) => (
-                    <LocalizedClientLink
-                      key={href}
+                  </StorefrontContentLink>
+                  {link.children.map(({ id, label, href, newTab }) => (
+                    <StorefrontContentLink
+                      key={id ?? href}
                       href={href}
+                      newTab={newTab}
                       className={navLinkMotion}
                       onClick={() => setOpenMenu(null)}
                     >
-                      {title}
+                      {label}
                       <HugeiconsIcon
                         icon={ArrowRight01Icon}
                         size={14}
                         className="-translate-x-1 opacity-0 transition-[opacity,transform] duration-150 ease-out group-hover/nav-link:translate-x-0 group-hover/nav-link:opacity-100 group-focus-visible/nav-link:translate-x-0 group-focus-visible/nav-link:opacity-100 motion-reduce:!transform-none motion-reduce:transition-none"
                       />
-                    </LocalizedClientLink>
+                    </StorefrontContentLink>
                   ))}
                 </PopoverContent>
               </Popover>
             ) : (
-              <LocalizedClientLink
+              <StorefrontContentLink
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
                   navItemMotion
                 )}
                 href={link.href}
-                key={link.title}
+                newTab={link.newTab}
+                key={link.id}
               >
-                {link.title}
-              </LocalizedClientLink>
+                {link.label}
+              </StorefrontContentLink>
             )
           )}
-          <LocalizedClientLink
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              navItemMotion
-            )}
-            href="/journal"
-          >
-            샥즈 소식
-          </LocalizedClientLink>
         </nav>
         {/* 状态选择器直接限定子项，避免容器悬停时同时点亮全部工具。 */}
-        <div className="header-tools flex shrink-0 items-center justify-self-end gap-0 md:gap-1 min-[1440px]:gap-2 [&>*]:size-11 [&>*]:rounded-full [&>*]:transition-colors [&>*]:duration-150 [&>*:hover]:bg-[#f2f0ec] [&>*[aria-expanded=true]]:bg-[#f2f0ec] min-[1440px]:[&>*]:size-12 [&>*]:motion-reduce:transition-none">
+        <div className="header-tools flex shrink-0 items-center justify-self-end gap-0 md:gap-1 min-[1440px]:gap-2 [&>*]:size-11 [&>*]:rounded-full [&>*]:transition-colors [&>*]:duration-150 [&>*:hover]:bg-secondary [&>*[aria-expanded=true]]:bg-secondary min-[1440px]:[&>*]:size-12 [&>*]:motion-reduce:transition-none">
           {handles.length > 0 && (
             <LocalizedClientLink
               href={"/compare?products=" + handles.join(",")}
@@ -354,16 +314,16 @@ export default function Nav({
           )}
         >
           <SheetHeader>
-            <SheetTitle className="shokz-logo">
+            <SheetTitle className="relative aspect-[57/23] w-[60px] md:w-[70px]">
               <Image
-                src={branding.logo}
+                src={logoURL}
                 alt="SHOKZ"
-                width={187}
-                height={55}
-                className="brand-logo-image"
+                fill
+                unoptimized
+                className="object-contain brightness-0 dark:invert"
               />
             </SheetTitle>
-            <SheetDescription>당신의 세상을 더 넓게.</SheetDescription>
+            <SheetDescription>{mobileSubtitle}</SheetDescription>
           </SheetHeader>
           <nav aria-label="모바일 메뉴" className="mobile-nav-content">
             <Accordion
@@ -371,11 +331,11 @@ export default function Nav({
               className="[&_[data-slot=accordion-content]]:h-[var(--accordion-panel-height)] [&_[data-slot=accordion-content]]:transition-[height,opacity] [&_[data-slot=accordion-content]]:duration-200 [&_[data-slot=accordion-content]]:ease-out [&_[data-slot=accordion-content][data-starting-style]]:h-0 [&_[data-slot=accordion-content][data-starting-style]]:opacity-0 [&_[data-slot=accordion-content][data-ending-style]]:h-0 [&_[data-slot=accordion-content][data-ending-style]]:opacity-0 [&_[data-slot=accordion-content]]:motion-reduce:transition-none"
             >
               {navigation.map((link) => (
-                <AccordionItem value={link.title} key={link.title}>
+                <AccordionItem value={link.id} key={link.id}>
                   {link.children.length ? (
                     <>
-                      <AccordionTrigger className="transition-colors duration-150 hover:text-[#c64800] hover:no-underline motion-reduce:transition-none [&_[data-slot=accordion-trigger-icon]]:!hidden">
-                        {link.title}
+                      <AccordionTrigger className="transition-colors duration-150 hover:text-accent-foreground hover:no-underline motion-reduce:transition-none [&_[data-slot=accordion-trigger-icon]]:!hidden">
+                        {link.mobileLabel || link.label}
                         <HugeiconsIcon
                           icon={ArrowDown01Icon}
                           size={18}
@@ -384,45 +344,41 @@ export default function Nav({
                       </AccordionTrigger>
                       <AccordionContent>
                         <div className="mobile-nav-links">
-                          <LocalizedClientLink
+                          <StorefrontContentLink
                             onClick={() => setPanel(null)}
                             href={link.href}
+                            newTab={link.newTab}
                             className={navLinkMotion}
                           >
                             전체 보기
-                          </LocalizedClientLink>
-                          {link.children.map(([title, href]) => (
-                            <LocalizedClientLink
+                          </StorefrontContentLink>
+                          {link.children.map(({ id, label, href, newTab }) => (
+                            <StorefrontContentLink
                               onClick={() => setPanel(null)}
-                              key={href}
+                              key={id ?? href}
                               href={href}
+                              newTab={newTab}
                               className={navLinkMotion}
                             >
-                              {title}
-                            </LocalizedClientLink>
+                              {label}
+                            </StorefrontContentLink>
                           ))}
                         </div>
                       </AccordionContent>
                     </>
                   ) : (
-                    <LocalizedClientLink
+                    <StorefrontContentLink
                       href={link.href}
+                      newTab={link.newTab}
                       onClick={() => setPanel(null)}
                       className={cn("mobile-nav-direct", navLinkMotion)}
                     >
-                      {link.title}
-                    </LocalizedClientLink>
+                      {link.mobileLabel || link.label}
+                    </StorefrontContentLink>
                   )}
                 </AccordionItem>
               ))}
             </Accordion>
-            <LocalizedClientLink
-              href="/journal"
-              onClick={() => setPanel(null)}
-              className={cn("mobile-nav-direct", navLinkMotion)}
-            >
-              샥즈 소식 & 이벤트
-            </LocalizedClientLink>
             <LocalizedClientLink
               href="/account"
               onClick={() => setPanel(null)}
@@ -493,7 +449,7 @@ export default function Nav({
                 key={query}
                 href={`/search?q=${encodeURIComponent(query)}`}
                 onClick={() => setPanel(null)}
-                className="group/search-suggestion outline-none transition-colors duration-150 hover:text-[#c64800] focus-visible:ring-2 focus-visible:ring-[#c64800]/40 motion-reduce:transition-none"
+                className="group/search-suggestion outline-none transition-colors duration-150 hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/40 motion-reduce:transition-none"
               >
                 {query}
                 <HugeiconsIcon
@@ -504,6 +460,13 @@ export default function Nav({
               </LocalizedClientLink>
             ))}
           </div>
+          <LocalizedClientLink
+            href="/content-search"
+            className="text-link w-fit"
+            onClick={() => setPanel(null)}
+          >
+            블로그와 페이지 검색
+          </LocalizedClientLink>
         </SheetContent>
       </Sheet>
     </div>

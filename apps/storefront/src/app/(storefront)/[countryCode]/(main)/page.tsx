@@ -18,7 +18,7 @@ import {
   listReferencedProducts,
 } from "@lib/data/cms"
 import { cmsMediaURL } from "@/cms/media-url"
-import { relationID } from "@/cms/content-model"
+import { blogCategoryLabels, relationID } from "@/cms/content-model"
 
 export const metadata: Metadata = {
   title: "SHOKZ Korea | 귀를 열고, 세상을 넓히다",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 }
 
 const eyebrowClassName =
-  "mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#a3400b] md:text-[11px]"
+  "mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent-foreground md:text-[11px]"
 const headingClassName =
   "text-[clamp(30px,3.3vw,48px)] font-semibold leading-[1.35] tracking-[-0.045em]"
 // 深色主题只作用于服务区，让内部卡片和轮播控件保持同一套配色。
@@ -134,7 +134,7 @@ export default async function Home({
         </div>
       </section>
       <section
-        className="border-y border-[#e9e6df] bg-white"
+        className="border-y border-border bg-card"
         aria-labelledby="awards-title"
       >
         <div className="content-container grid items-center gap-6 py-10 lg:grid-cols-[0.9fr_1.5fr] lg:gap-10 lg:py-12">
@@ -150,7 +150,7 @@ export default async function Home({
             </h2>
           </div>
           <div
-            className="grid grid-cols-2 gap-px overflow-hidden border border-[#e9e6df] bg-[#e9e6df] sm:grid-cols-3 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-px overflow-hidden border border-border bg-border sm:grid-cols-3 lg:grid-cols-4"
             data-reveal
           >
             {home.awards.map((award) => (
@@ -196,7 +196,7 @@ export default async function Home({
           </p>
         </div>
         <div
-          className="grid auto-cols-[86%] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain pb-3 [scroll-snap-type:x_mandatory] [scrollbar-color:#d96427_#e9e5de] [scrollbar-width:thin] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ff6008] md:grid-flow-row md:grid-cols-[1.1fr_1fr_1fr] md:grid-rows-[repeat(2,250px)] md:overflow-visible md:pb-0"
+          className="grid auto-cols-[86%] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain pb-3 [scroll-snap-type:x_mandatory] [scrollbar-color:#d96427_#e9e5de] [scrollbar-width:thin] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring md:grid-flow-row md:grid-cols-[1.1fr_1fr_1fr] md:grid-rows-[repeat(2,250px)] md:overflow-visible md:pb-0"
           role="region"
           aria-label="샥즈 커뮤니티 이야기"
           tabIndex={0}
@@ -254,7 +254,7 @@ export default async function Home({
                       {review.author || "SHOKZ COMMUNITY"}
                     </small>
                     <span
-                      className="grid h-9 w-9 place-items-center rounded-full border border-white/60 transition-[background-color,border-color,transform] group-hover:translate-x-1 group-hover:border-[#ff6008] group-hover:bg-[#ff6008] group-hover:text-[#171717]"
+                      className="grid h-9 w-9 place-items-center rounded-full border border-white/60 transition-[background-color,border-color,transform] group-hover:translate-x-1 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground"
                       aria-hidden="true"
                     >
                       <HugeiconsIcon icon={ArrowRight01Icon} size={19} />
@@ -288,7 +288,7 @@ export default async function Home({
           </div>
           <LocalizedClientLink
             href="/journal"
-            className="group inline-flex min-h-11 items-center gap-4 text-[13px] font-medium hover:text-[#a3400b]"
+            className="group inline-flex min-h-11 items-center gap-4 text-[13px] font-medium hover:text-accent-foreground"
           >
             모든 소식 보기
             <HugeiconsIcon
@@ -305,7 +305,7 @@ export default async function Home({
               <LocalizedClientLink
                 href={"/journal/" + article.slug}
                 key={article.slug}
-                className="group flex min-w-0 flex-col border-b border-[#dedbd4] pb-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6008]"
+                className="group flex min-w-0 flex-col border-b border-border pb-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
                 data-reveal
               >
                 {photo && (
@@ -320,8 +320,8 @@ export default async function Home({
                     />
                   </div>
                 )}
-                <span className="text-[10px] font-semibold tracking-[0.14em] text-[#a3400b]">
-                  {article.category.toUpperCase()}
+                <span className="text-[10px] font-semibold tracking-[0.14em] text-accent-foreground">
+                  {blogCategoryLabels(article.categories)}
                 </span>
                 <h3 className="mb-5 mt-3 text-lg font-semibold leading-[1.7] tracking-[-0.025em] md:text-xl">
                   {article.title}

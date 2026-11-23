@@ -72,7 +72,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
           </span>
         </div>
       </div>
-      <div className="h-px w-full border-b border-gray-200 my-4" />
+      <div className="h-px w-full border-b border-border my-4" />
       <div className="flex items-center justify-between text-foreground mb-2 text-sm ">
         <span>{shippingPending ? "예상 합계" : "합계"}</span>
         <span

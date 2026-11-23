@@ -4,13 +4,13 @@ import {
   RichText,
   type JSXConvertersFunction,
 } from "@payloadcms/richtext-lexical/react"
-import type { Page, Post } from "@/payload-types"
+import type { Post } from "@/payload-types"
 
 export default function CmsRichText({
   data,
   countryCode,
 }: {
-  data: Page["body"] | Post["body"]
+  data: Post["body"]
   countryCode: string
 }) {
   const converters: JSXConvertersFunction = ({ defaultConverters }) => ({

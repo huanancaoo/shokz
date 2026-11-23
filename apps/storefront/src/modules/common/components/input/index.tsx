@@ -38,7 +38,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {props.required && <span aria-hidden="true">*</span>}
         </FieldLabel>
         {type === "password" ? (
-          <InputGroup className="h-12 min-h-12 w-full rounded-[10px] border border-[#c9c5bf] bg-white transition-[border-color,box-shadow] focus-within:border-[#c34400] focus-within:ring-[3px] focus-within:ring-[#ff6008]/10 has-[[aria-invalid=true]]:border-destructive has-[:disabled]:bg-[#f1f0ed] has-[:disabled]:opacity-60">
+          <InputGroup className="h-12 min-h-12 w-full rounded-[calc(10px*var(--storefront-radius-scale))] border border-input bg-card transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-[3px] focus-within:ring-ring/10 has-[[aria-invalid=true]]:border-destructive has-[:disabled]:bg-[#f1f0ed] has-[:disabled]:opacity-60">
             <InputControl
               ref={ref}
               id={inputId}
@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               data-slot="input-group-control"
               aria-invalid={Boolean(error)}
               className={cn(
-                "h-[46px] min-w-0 flex-1 rounded-[inherit] border-0 bg-transparent px-3.5 py-3 text-sm text-[#171717] shadow-none outline-none ring-0 placeholder:text-[#77736f] focus-visible:ring-0 aria-[invalid=true]:ring-0 disabled:bg-transparent max-md:text-base",
+                "h-[46px] min-w-0 flex-1 rounded-[inherit] border-0 bg-transparent px-3.5 py-3 text-sm text-foreground shadow-none outline-none ring-0 placeholder:text-[#77736f] focus-visible:ring-0 aria-[invalid=true]:ring-0 disabled:bg-transparent max-md:text-base",
                 className
               )}
               {...props}
@@ -56,7 +56,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               type="button"
               variant="ghost"
               size="icon"
-              className="mr-0.5 grid size-11 shrink-0 place-items-center rounded-[7px] border-0 bg-transparent text-[#68635e] transition-colors hover:bg-[#f3f1ec] hover:text-[#171717] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#c34400] disabled:cursor-not-allowed"
+              className="mr-0.5 grid size-11 shrink-0 place-items-center rounded-[calc(7px*var(--storefront-radius-scale))] border-0 bg-transparent text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#c34400] disabled:cursor-not-allowed"
               aria-label={visible ? "비밀번호 숨기기" : "비밀번호 표시"}
               aria-pressed={visible}
               aria-controls={inputId}

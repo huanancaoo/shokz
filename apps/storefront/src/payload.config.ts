@@ -11,15 +11,20 @@ import { ko } from "@payloadcms/translations/languages/ko"
 import { zh } from "@payloadcms/translations/languages/zh"
 import { buildConfig } from "payload"
 import sharp from "sharp"
-import { isStaff } from "./cms/access"
+import { isStaff, staffAccess } from "./cms/access"
 import { withCmsListViews } from "./cms/admin/list/config"
 import { CommerceSync, Users } from "./cms/collections/accounts"
+import { Categories } from "./cms/collections/categories"
 import { Banners, Pages, Posts } from "./cms/collections/editorial"
 import { FormUploads, Media } from "./cms/collections/media"
 import { MedusaProducts } from "./cms/collections/medusa-products"
-import { contentCollections, relationID } from "./cms/content-model"
+import { StorefrontThemes } from "./cms/collections/storefront-themes"
+import { contentCollections } from "./cms/content-model"
 import { SiteSettings } from "./cms/globals/site-settings"
+import { StorefrontAppearance } from "./cms/globals/storefront-appearance"
+import { StorefrontFooter, StorefrontHeader } from "./cms/globals/storefront-layout"
 import { cmsPlugins } from "./cms/plugins"
+import { cmsPreviewPath } from "./cms/preview-path"
 
 const {
   PAYLOAD_DATABASE_URL,
@@ -83,14 +88,14 @@ export default buildConfig({
     },
     livePreview: {
       collections: [...contentCollections],
-      url: ({ collectionConfig, data, locale }) => {
-        const id = relationID(data.id)
-        if (!collectionConfig || !id) return
-        return new URL(
-          `/cms-preview/${collectionConfig.slug}/${id}?locale=${locale.code}`,
-          PAYLOAD_SERVER_URL
-        ).href
-      },
+      breakpoints: [
+        { label: "手机", name: "mobile", width: 375, height: 667 },
+        { label: "平板", name: "tablet", width: 768, height: 1024 },
+        { label: "桌面", name: "desktop", width: 1440, height: 900 },
+      ],
+      url: ({ collectionConfig, data, locale }) =>
+        collectionConfig &&
+        cmsPreviewPath(collectionConfig.slug, data.id, locale.code),
     },
   },
   collections: [
@@ -98,14 +103,21 @@ export default buildConfig({
     CommerceSync,
     Pages,
     Posts,
+    Categories,
     Banners,
     Media,
     FormUploads,
     MedusaProducts,
+    StorefrontThemes,
   ],
-  globals: [SiteSettings],
+  globals: [SiteSettings, StorefrontAppearance, StorefrontHeader, StorefrontFooter],
   cookiePrefix: "shokz-cms",
   csrf,
+  folders: {
+    collectionOverrides: [
+      ({ collection }) => ({ ...collection, access: staffAccess }),
+    ],
+  },
   db: postgresAdapter({
     pool: { connectionString: PAYLOAD_DATABASE_URL },
     migrationDir: path.resolve("src/cms/migrations"),

@@ -1,6 +1,8 @@
-import type { CollectionConfig, Field } from "payload"
+import type { CollectionConfig, Field, TabsField } from "payload"
 import { staffAccess } from "../access"
-import { postCategories } from "../content-model"
+import { editorialText } from "../fields/editorial-text"
+import { pageHero, pageLayout } from "../fields/page-layout"
+import { cmsPreviewPath } from "../preview-path"
 
 const versions = { drafts: { autosave: true, schedulePublish: true } }
 
@@ -19,19 +21,26 @@ function identity(): Field[] {
   ]
 }
 
-function articleFields(): Field[] {
-  return [
-    ...identity(),
-    { name: "body", type: "richText", required: true, localized: true },
-    { name: "photos", type: "upload", relationTo: "media", hasMany: true },
-    {
-      name: "products",
-      type: "relationship",
-      relationTo: "medusa-products",
-      hasMany: true,
-      label: "关联商品",
-    },
-  ]
+function editorialTabs(tabs: TabsField["tabs"], details: Field[]): TabsField {
+  return {
+    type: "tabs",
+    tabs: [
+      ...tabs,
+      {
+        label: "关联与设置",
+        fields: [
+          ...details,
+          {
+            name: "products",
+            type: "relationship",
+            relationTo: "medusa-products",
+            hasMany: true,
+            label: "关联商品",
+          },
+        ],
+      },
+    ],
+  }
 }
 
 export const Pages: CollectionConfig = {
@@ -41,19 +50,27 @@ export const Pages: CollectionConfig = {
     group: "内容",
     useAsTitle: "title",
     defaultColumns: ["title", "kind", "_status", "updatedAt"],
+    preview: (data, { locale }) => cmsPreviewPath("pages", data.id, locale),
   },
   access: staffAccess,
   versions,
   trash: true,
   fields: [
-    ...articleFields(),
-    {
-      name: "kind",
-      type: "select",
-      defaultValue: "editorial",
-      required: true,
-      options: ["editorial", "display", "membership"],
-    },
+    editorialTabs(
+      [
+        { label: "内容", fields: [...identity(), pageLayout] },
+        { label: "头图区", fields: [pageHero] },
+      ],
+      [
+        {
+          name: "kind",
+          type: "select",
+          defaultValue: "editorial",
+          required: true,
+          options: ["editorial", "display", "membership"],
+        },
+      ]
+    ),
   ],
 }
 
@@ -63,23 +80,42 @@ export const Posts: CollectionConfig = {
   admin: {
     group: "内容",
     useAsTitle: "title",
-    defaultColumns: ["title", "category", "_status", "updatedAt"],
+    defaultColumns: ["title", "categories", "_status", "updatedAt"],
+    preview: (data, { locale }) => cmsPreviewPath("posts", data.id, locale),
   },
   access: staffAccess,
   versions,
   trash: true,
   fields: [
-    ...articleFields(),
-    {
-      name: "category",
-      type: "select",
-      required: true,
-      options: Object.entries(postCategories).map(([value, label]) => ({
-        value,
-        label,
-      })),
-    },
-    { name: "sortOrder", type: "number", required: true, defaultValue: 0 },
+    editorialTabs(
+      [
+        {
+          label: "内容",
+          fields: [
+            ...identity(),
+            {
+              name: "body",
+              type: "richText",
+              editor: editorialText,
+              required: true,
+              localized: true,
+            },
+            { name: "photos", type: "upload", relationTo: "media", hasMany: true },
+          ],
+        },
+      ],
+      [
+        {
+          name: "categories",
+          label: "博客分类",
+          type: "relationship",
+          relationTo: "categories",
+          hasMany: true,
+          required: true,
+        },
+        { name: "sortOrder", type: "number", required: true, defaultValue: 0 },
+      ]
+    ),
   ],
 }
 
@@ -90,6 +126,7 @@ export const Banners: CollectionConfig = {
     group: "内容",
     useAsTitle: "title",
     defaultColumns: ["title", "format", "_status", "updatedAt"],
+    preview: (data, { locale }) => cmsPreviewPath("banners", data.id, locale),
   },
   access: staffAccess,
   versions,

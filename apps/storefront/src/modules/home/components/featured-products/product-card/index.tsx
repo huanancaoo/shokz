@@ -31,12 +31,12 @@ export default function HomeProductCard({
   return (
     <Card
       role="article"
-      className="relative min-w-0 snap-start gap-0 rounded-2xl border border-[#e5e2db] bg-[#f3f2ef] py-0 text-[#171717] ring-0 transition-colors duration-200 hover:border-[#bcb5a8] focus-within:border-[#ff6008] motion-reduce:transition-none"
+      className="relative min-w-0 snap-start gap-0 rounded-2xl border border-[#e5e2db] bg-[#f3f2ef] py-0 text-foreground ring-0 transition-colors duration-200 hover:border-[#bcb5a8] focus-within:border-primary motion-reduce:transition-none"
       data-testid="product-wrapper"
     >
       <div className="flex min-h-14 items-center justify-between gap-3 px-5 pt-2 md:px-6">
         {data?.badge?.[0] && (
-          <Badge className="h-5 rounded-[4px] border-0 bg-[#171717] px-2 text-[9px] font-semibold tracking-[0.09em] text-white">
+          <Badge className="h-5 rounded-[calc(4px*var(--storefront-radius-scale))] border-0 bg-[#171717] px-2 text-[9px] font-semibold tracking-[0.09em] text-white">
             {data.badge[0]}
           </Badge>
         )}
@@ -61,7 +61,7 @@ export default function HomeProductCard({
         <LocalizedClientLink
           href={productHref}
           aria-label={product.title + " 제품 알아보기"}
-          className="absolute inset-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-[#ff6008]"
+          className="absolute inset-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
         >
           {/* SPU 主图代表产品形态；SKU 相册首张可能是人物图，不能用于首页主视觉。 */}
           {product.thumbnail && (
@@ -100,9 +100,9 @@ export default function HomeProductCard({
             aria-pressed={showScene}
             aria-controls={mediaId}
             onClick={() => setShowScene((value) => !value)}
-            className="absolute bottom-2 right-2 h-12 gap-2 overflow-hidden rounded-lg border-white bg-white p-1 pr-3 text-[10px] text-[#56514a] shadow-none transition-colors hover:border-[#ff6008] hover:bg-white aria-pressed:border-[#ff6008] aria-pressed:text-[#a73a00] active:translate-y-0 motion-reduce:transition-none"
+            className="absolute bottom-2 right-2 h-12 gap-2 overflow-hidden rounded-lg border-white bg-card p-1 pr-3 text-[10px] text-[#56514a] shadow-none transition-colors hover:border-primary hover:bg-card aria-pressed:border-primary aria-pressed:text-[#a73a00] active:translate-y-0 motion-reduce:transition-none"
           >
-            <span className="relative h-10 w-8 overflow-hidden rounded-[4px]">
+            <span className="relative h-10 w-8 overflow-hidden rounded-[calc(4px*var(--storefront-radius-scale))]">
               <Image
                 src={scene.scene}
                 alt=""
@@ -128,11 +128,11 @@ export default function HomeProductCard({
             href={productHref}
             className={cn(
               buttonVariants({ variant: "ghost" }),
-              "group/detail h-11 gap-2 rounded-full py-0 pl-3 pr-0 text-[11px] text-[#171717] transition-colors duration-200 hover:bg-transparent hover:text-[#a73a00] active:translate-y-0 motion-reduce:transition-none"
+              "group/detail h-11 gap-2 rounded-full py-0 pl-3 pr-0 text-[11px] text-foreground transition-colors duration-200 hover:bg-transparent hover:text-[#a73a00] active:translate-y-0 motion-reduce:transition-none"
             )}
           >
             제품 보기
-            <span className="flex size-11 items-center justify-center rounded-full bg-[#ff6008] text-[#171717] transition-colors duration-200 group-hover/detail:bg-[#171717] group-hover/detail:text-white group-focus-visible/detail:bg-[#171717] group-focus-visible/detail:text-white motion-reduce:transition-none">
+            <span className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors duration-200 group-hover/detail:bg-[#171717] group-hover/detail:text-white group-focus-visible/detail:bg-[#171717] group-focus-visible/detail:text-white motion-reduce:transition-none">
               <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
             </span>
           </LocalizedClientLink>

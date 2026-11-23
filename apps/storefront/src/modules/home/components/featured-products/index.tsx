@@ -49,7 +49,7 @@ export default function FeaturedProducts({
             />
             {home.lineup.map((tab) => (
               <TabsTrigger
-                className="group relative z-10 h-11 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2 py-0 text-[11px] font-medium text-[#66615a] transition-[color,background-color] duration-300 after:hidden hover:bg-[#e6e3dd] hover:text-[#171717] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#ff6008] focus-visible:ring-0 data-[active]:bg-transparent data-[active]:text-white data-[active]:hover:bg-transparent data-[active]:hover:text-white group-data-[variant=default]/tabs-list:data-[active]:shadow-none motion-reduce:transition-none md:min-w-[80px] md:flex-none md:px-6 md:text-xs"
+                className="group relative z-10 h-11 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2 py-0 text-[11px] font-medium text-[#66615a] transition-[color,background-color] duration-300 after:hidden hover:bg-[#e6e3dd] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-ring focus-visible:ring-0 data-[active]:bg-transparent data-[active]:text-white data-[active]:hover:bg-transparent data-[active]:hover:text-white group-data-[variant=default]/tabs-list:data-[active]:shadow-none motion-reduce:transition-none md:min-w-[80px] md:flex-none md:px-6 md:text-xs"
                 key={tab.id}
                 value={tab.id}
               >
@@ -62,7 +62,7 @@ export default function FeaturedProducts({
         </div>
         {home.lineup.map((tab) => (
           <TabsContent
-            className="outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ff6008]"
+            className="outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             value={tab.id}
             key={tab.id}
           >

@@ -58,7 +58,7 @@ function SidebarGroupLabel({
     props: mergeProps<"div">(
       {
         className: cn(
-          "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-muted-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring",
+          "flex h-8 shrink-0 items-center rounded-md px-2 text-base font-medium text-muted-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring",
           className
         ),
       },
@@ -103,7 +103,7 @@ function SidebarMenuButton({
     props: mergeProps<"button">(
       {
         className: cn(
-          "flex h-8 w-full min-w-0 items-center gap-2 overflow-hidden rounded-md border-0 bg-transparent px-2 py-0 text-left text-sm text-inherit no-underline",
+          "flex h-8 w-full min-w-0 items-center gap-2 overflow-hidden rounded-md border-0 bg-transparent px-2 py-0 text-left text-lg text-inherit no-underline",
           "hover:bg-accent hover:text-accent-foreground hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring",
           "data-[open]:bg-accent data-[active]:bg-accent data-[active]:font-medium data-[active]:text-accent-foreground [&_svg]:size-4 [&_svg]:shrink-0",
           className

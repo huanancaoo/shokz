@@ -1,14 +1,15 @@
-import Image from "@modules/common/components/store-image"
-import branding from "@/content/branding.json"
+import Image from "next/image"
+import { getStorefrontHeader } from "@lib/data/cms"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-export default function CheckoutLayout({
+export default async function CheckoutLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { logoURL } = await getStorefrontHeader()
   return (
     <div className="min-h-svh bg-muted">
       <header className="border-b bg-background">
@@ -35,13 +36,15 @@ export default function CheckoutLayout({
             className="grid min-h-11 place-items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
             data-testid="store-link"
           >
-            <Image
-              src={branding.logo}
-              alt="SHOKZ"
-              width={187}
-              height={55}
-              className="h-auto w-[88px] invert sm:w-[102px]"
-            />
+            <span className="relative aspect-[57/23] w-[54px] sm:w-[62px]">
+              <Image
+                src={logoURL}
+                alt="SHOKZ"
+                fill
+                unoptimized
+                className="object-contain brightness-0 dark:invert"
+              />
+            </span>
           </LocalizedClientLink>
         </nav>
       </header>

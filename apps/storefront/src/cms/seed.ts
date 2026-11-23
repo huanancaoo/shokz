@@ -113,28 +113,44 @@ try {
   let imported = 0
   for (const page of pages) {
     if (await exists("pages", page.slug)) continue
+    const [cover, ...gallery] = await importPhotos(page.images)
+    const layout: Page["layout"] = []
+    if (cover) layout.push({ blockType: "mediaBlock", display: "featured", media: [cover] })
+    layout.push({
+      blockType: "content",
+      columns: [{ size: "full", richText: paragraphsToLexical(page.paragraphs) }],
+    })
+    if (gallery.length) layout.push({ blockType: "mediaBlock", display: "gallery", media: gallery })
     await payload.create({
       collection: "pages",
       data: {
         slug: page.slug,
         title: page.title,
         kind: page.kind as Page["kind"],
-        body: paragraphsToLexical(page.paragraphs),
-        photos: await importPhotos(page.images),
+        hero: { type: "lowImpact" },
+        layout,
         _status: "published",
       },
     })
     imported++
   }
 
+  const { docs: categories } = await payload.find({
+    collection: "categories",
+    pagination: false,
+    depth: 0,
+  })
+  const categoryIDs = new Map(categories.map(({ id, slug }) => [slug, id]))
   for (const [index, article] of articles.entries()) {
     if (await exists("posts", article.slug)) continue
+    const categoryID = categoryIDs.get(article.category)
+    if (!categoryID) throw new Error(`Missing blog category ${article.category}`)
     await payload.create({
       collection: "posts",
       data: {
         slug: article.slug,
         title: article.title,
-        category: article.category as Post["category"],
+        categories: [categoryID],
         body: paragraphsToLexical(article.paragraphs),
         photos: await importPhotos(article.images),
         sortOrder: index,

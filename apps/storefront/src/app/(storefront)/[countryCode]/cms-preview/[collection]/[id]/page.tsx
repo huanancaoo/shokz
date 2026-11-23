@@ -3,15 +3,19 @@ import { headers } from "next/headers"
 import { notFound } from "next/navigation"
 import { getPayload } from "payload"
 import { contentCollections, type ContentCollection } from "@/cms/content-model"
+import Editorial from "@modules/common/components/content-page"
 import Preview from "./preview"
+import PreviewRefresh from "./preview-refresh"
+
+export const metadata = { robots: { index: false, follow: false } }
 
 type Props = {
-  params: Promise<{ collection: string; id: string }>
+  params: Promise<{ collection: string; countryCode: string; id: string }>
   searchParams: Promise<{ locale?: string }>
 }
 
 export default async function PreviewPage({ params, searchParams }: Props) {
-  const { collection, id } = await params
+  const { collection, countryCode, id } = await params
   const { locale } = await searchParams
   const documentID = Number(id)
   if (
@@ -36,5 +40,13 @@ export default async function PreviewPage({ params, searchParams }: Props) {
     disableErrors: true,
   })
   if (!content) notFound()
-  return <Preview content={content} serverURL={payload.config.serverURL} />
+  if ("kind" in content) {
+    return (
+      <>
+        <PreviewRefresh serverURL={payload.config.serverURL} />
+        <Editorial page={content} countryCode={countryCode} preview />
+      </>
+    )
+  }
+  return <Preview content={content} countryCode={countryCode} serverURL={payload.config.serverURL} />
 }

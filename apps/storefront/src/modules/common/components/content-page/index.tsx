@@ -1,7 +1,7 @@
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
 import Image from "@modules/common/components/store-image"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Link from "next/link"
 import { Button } from "@modules/common/components/ui/button"
 import { Input } from "@modules/common/components/ui/input"
 import { Label } from "@modules/common/components/ui/label"
@@ -12,17 +12,21 @@ import { listReferencedProducts } from "@lib/data/cms"
 import { cmsMediaURL } from "@/cms/media-url"
 import { relationID } from "@/cms/content-model"
 import type { Page, Post } from "@/payload-types"
+import PageBlocks, { PageHero } from "./page-blocks"
 
 export default async function Editorial({
   page,
   countryCode,
+  preview = false,
 }: {
   page: Page | Post
   countryCode: string
+  preview?: boolean
 }) {
-  const kind = "kind" in page ? page.kind : "article"
+  const isPage = "kind" in page
+  const kind = isPage ? page.kind : "article"
   const display = ["display", "membership"].includes(kind)
-  const photos = (page.photos ?? [])
+  const photos = (isPage ? [] : page.photos ?? [])
     .map(cmsMediaURL)
     .filter((url): url is string => Boolean(url))
   const productIDs = (page.products ?? [])
@@ -31,14 +35,14 @@ export default async function Editorial({
   const products = await listReferencedProducts(countryCode, productIDs)
   return (
     <article>
-      <header className="editorial-hero">
-        <div className="content-container">
-          <p className="eyebrow">
-            SHOKZ · {kind === "article" ? "JOURNAL" : "OPEN YOUR WORLD"}
-          </p>
-          <h1>{page.title}</h1>
-        </div>
-      </header>
+      {isPage ? <PageHero page={page} countryCode={countryCode} /> : (
+        <header className="editorial-hero">
+          <div className="content-container">
+            <p className="eyebrow">SHOKZ · JOURNAL</p>
+            <h1>{page.title}</h1>
+          </div>
+        </header>
+      )}
       <div className="editorial-body content-container">
         {display && (
           <p className="display-notice mb-8">
@@ -46,32 +50,38 @@ export default async function Editorial({
             신청 및 개인정보 수집은 진행되지 않습니다.
           </p>
         )}
-        {photos[0] && (
-          <Image
-            className="editorial-main-image"
-            src={photos[0]}
-            alt={page.title}
-            width={1200}
-            height={700}
-            priority
-          />
-        )}
-        <div className="editorial-paragraphs">
-          <CmsRichText data={page.body} countryCode={countryCode} />
-        </div>
-        {photos.length > 1 && (
-          <div className="editorial-gallery">
-            {photos.slice(1).map((image, index) => (
+        {isPage ? (
+          <PageBlocks page={page} countryCode={countryCode} preview={preview} />
+        ) : (
+          <>
+            {photos[0] && (
               <Image
-                key={`${image}-${index}`}
-                src={image}
+                className="editorial-main-image"
+                src={photos[0]}
                 alt={page.title}
-                width={800}
-                height={650}
-                loading="lazy"
+                width={1200}
+                height={700}
+                priority
               />
-            ))}
-          </div>
+            )}
+            <div className="editorial-paragraphs">
+              <CmsRichText data={page.body} countryCode={countryCode} />
+            </div>
+            {photos.length > 1 && (
+              <div className="editorial-gallery">
+                {photos.slice(1).map((image, index) => (
+                  <Image
+                    key={`${image}-${index}`}
+                    src={image}
+                    alt={page.title}
+                    width={800}
+                    height={650}
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
         {products.length > 0 && (
           <section className="mt-12" aria-labelledby="editorial-products">
@@ -117,9 +127,9 @@ export default async function Editorial({
           </section>
         )}
         <div className="mt-12">
-          <LocalizedClientLink href="/store" className="text-link">
+          <Link href={`/${countryCode}/store`} className="text-link">
             샥즈 제품 만나보기 <HugeiconsIcon icon={ArrowRight01Icon} />
-          </LocalizedClientLink>
+          </Link>
         </div>
       </div>
     </article>

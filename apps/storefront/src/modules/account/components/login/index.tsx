@@ -18,22 +18,22 @@ const Login = ({ setCurrentView }: Props) => {
   return (
     <div className="w-full" data-testid="login-page">
       <div className="mb-[30px] max-[480px]:mb-[26px]">
-        <p className="mb-3 text-[10px] font-semibold tracking-[.17em] text-[#b64107]">
+        <p className="mb-3 text-[10px] font-semibold tracking-[.17em] text-accent-foreground">
           MY SHOKZ
         </p>
         <h1
-          className="mb-3 text-[clamp(26px,2.3vw,32px)] font-semibold leading-[1.4] tracking-[-1.25px] text-[#191917] focus:outline-none max-[480px]:text-[27px]"
+          className="mb-3 text-[clamp(26px,2.3vw,32px)] font-semibold leading-[1.4] tracking-[-1.25px] text-foreground focus:outline-none max-[480px]:text-[27px]"
           tabIndex={-1}
         >
           다시 만나 반갑습니다
         </h1>
-        <p className="max-w-[365px] text-[13px] leading-[1.85] text-[#6c675f]">
+        <p className="max-w-[365px] text-[13px] leading-[1.85] text-muted-foreground">
           이메일로 로그인해 주세요.
         </p>
       </div>
       {message?.state === "verification_required" && (
         <div
-          className="mb-[22px] break-words border-l-[3px] border-[#cf4c09] bg-[#fff0e5] px-4 py-3.5 text-xs leading-[1.85] text-[#743814]"
+          className="mb-[22px] break-words border-l-[3px] border-primary bg-accent px-4 py-3.5 text-xs leading-[1.85] text-accent-foreground"
           role="status"
           data-testid="login-verification-message"
         >
@@ -50,7 +50,7 @@ const Login = ({ setCurrentView }: Props) => {
             title="올바른 이메일 주소를 입력해 주세요."
             autoComplete="email"
             placeholder="name@example.com"
-            className="h-12 border-[#c9c5bf] text-sm placeholder:text-[#878079] focus-visible:border-[#c34400] focus-visible:ring-[#ff6008]/10 max-md:text-base"
+            className="h-12 border-input text-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-ring/10 max-md:text-base"
             required
             data-testid="email-input"
           />
@@ -76,7 +76,7 @@ const Login = ({ setCurrentView }: Props) => {
         )}
         <SubmitButton
           data-testid="sign-in-button"
-          className="mt-[26px] h-[50px] min-h-[50px] w-full justify-between gap-3.5 rounded-[9px] border border-[#ff6008] bg-[#ff6008] px-[18px] text-sm font-semibold text-[#171717] shadow-none transition-[background,transform] hover:-translate-y-px hover:border-[#ed5700] hover:bg-[#ed5700] active:translate-y-0 disabled:translate-y-0 disabled:border-[#e8e4dc] disabled:bg-[#e8e4dc] disabled:text-[#77726a] disabled:opacity-100 motion-reduce:transform-none motion-reduce:transition-none"
+          className="mt-[26px] h-[50px] min-h-[50px] w-full justify-between gap-3.5 rounded-[calc(9px*var(--storefront-radius-scale))] border border-primary bg-primary px-[18px] text-sm font-semibold text-primary-foreground shadow-none transition-[background,transform] hover:-translate-y-px hover:border-[#ed5700] hover:bg-[#ed5700] active:translate-y-0 disabled:translate-y-0 disabled:border-[#e8e4dc] disabled:bg-[#e8e4dc] disabled:text-[#77726a] disabled:opacity-100 motion-reduce:transform-none motion-reduce:transition-none"
         >
           로그인
           <HugeiconsIcon
@@ -87,13 +87,13 @@ const Login = ({ setCurrentView }: Props) => {
           />
         </SubmitButton>
       </form>
-      <div className="mt-[26px] flex flex-wrap items-center justify-between gap-3 border-t border-[#e6e3dc] pt-[22px] text-xs">
-        <span className="text-[#6c675f]">아직 계정이 없으신가요?</span>
+      <div className="mt-[26px] flex flex-wrap items-center justify-between gap-3 border-t border-border pt-[22px] text-xs">
+        <span className="text-muted-foreground">아직 계정이 없으신가요?</span>
         <Button
           type="button"
           variant="ghost"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="h-auto min-h-[38px] gap-[9px] rounded-none p-0 text-xs font-semibold text-[#a23a08] hover:bg-transparent hover:text-[#171717]"
+          className="h-auto min-h-[38px] gap-[9px] rounded-none p-0 text-xs font-semibold text-accent-foreground hover:bg-transparent hover:text-foreground"
           data-testid="register-button"
         >
           회원가입

@@ -43,7 +43,7 @@ const focusRing =
 const eyebrow =
   "mb-[18px] text-[10px] font-semibold tracking-[0.17em] text-[#ff9a60] max-md:mb-3.5 max-md:text-[9px]"
 const primaryAction =
-  "h-auto min-h-12 gap-3.5 rounded-md border-[#ff7a32] bg-[#ff7a32] px-6 py-3 text-[13px] text-[#18201b] hover:border-[#ff9f66] hover:bg-[#ff9f66] disabled:border-[#758277] disabled:bg-[#758277] disabled:text-[#132017] disabled:opacity-100 max-md:min-h-[46px] max-md:gap-2.5 max-md:px-4 max-md:text-xs"
+  "h-auto min-h-12 gap-3.5 rounded-md border-primary bg-primary px-6 py-3 text-[13px] text-primary-foreground hover:border-primary hover:bg-primary/80 disabled:border-[#758277] disabled:bg-[#758277] disabled:text-[#132017] disabled:opacity-100 max-md:min-h-[46px] max-md:gap-2.5 max-md:px-4 max-md:text-xs"
 const secondaryAction =
   "h-auto min-h-12 gap-2.5 rounded-md border border-[#728073] bg-[#1a231e] px-5 py-3 text-xs text-[#f1f3ed] hover:border-[#b5c1af] hover:bg-[#324135] hover:text-white max-md:min-h-[46px] max-md:px-4"
 
@@ -137,6 +137,7 @@ export default function ProductFinder({
                   <Button
                     type="button"
                     variant="ghost"
+                      data-preserve-button-shape
                     disabled={value > step || skipped}
                     aria-current={step === value ? "step" : undefined}
                     data-complete={completed || undefined}
@@ -145,7 +146,7 @@ export default function ProductFinder({
                       focusRing,
                       completed && "text-[#e4e8e1]",
                       step === value &&
-                        "border-b-[3px] border-[#ff7a32] font-[650] text-white"
+                        "border-b-[3px] border-primary font-[650] text-white"
                     )}
                     onClick={() => setStep(value)}
                   >
@@ -154,7 +155,7 @@ export default function ProductFinder({
                         "grid size-[31px] shrink-0 place-items-center rounded border border-[#6e7a70] font-sans text-[11px] max-md:size-[27px] max-md:text-[10px]",
                         completed && "border-[#829a86] text-[#aaccad]",
                         step === value &&
-                          "border-[#ff7a32] bg-[#ff7a32] text-[#1a231e]"
+                          "border-primary bg-primary text-primary-foreground"
                       )}
                     >
                       {completed ? (
@@ -196,6 +197,7 @@ export default function ProductFinder({
               <Button
                 type="button"
                 variant="ghost"
+                  data-preserve-button-shape
                 className={cn(
                   "inline-flex h-auto min-h-11 shrink-0 items-center gap-2.5 rounded-none border-0 bg-transparent px-0 py-2 text-xs text-[#dbe1d9] hover:bg-transparent hover:text-[#ffac7c] max-md:min-h-[34px] max-md:text-[11px]",
                   focusRing
@@ -216,10 +218,11 @@ export default function ProductFinder({
                 <Button
                   type="button"
                   variant="ghost"
+                    data-preserve-button-shape
                   key={item.id}
                   onClick={() => chooseScene(item.id)}
                   className={cn(
-                    "group/finder-scene relative isolate block aspect-[0.92] h-auto w-full overflow-hidden whitespace-normal rounded-lg border border-[#596358] bg-[#28392d] p-0 text-left text-[#f8f7f2] after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:bg-[linear-gradient(180deg,#111a1430_0%,#10191200_22%,#101912e8_100%)] hover:border-[#ff8a4b] hover:bg-[#28392d] hover:text-[#f8f7f2] focus-visible:border-[#ff8a4b] max-md:aspect-[0.82] max-md:rounded-md",
+                    "group/finder-scene relative isolate block aspect-[0.92] h-auto w-full overflow-hidden whitespace-normal rounded-lg border border-[#596358] bg-[#28392d] p-0 text-left text-[#f8f7f2] after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:bg-[linear-gradient(180deg,#111a1430_0%,#10191200_22%,#101912e8_100%)] hover:border-primary hover:bg-[#28392d] hover:text-[#f8f7f2] focus-visible:border-primary max-md:aspect-[0.82] max-md:rounded-md",
                     focusRing
                   )}
                 >
@@ -249,7 +252,7 @@ export default function ProductFinder({
                       </small>
                     )}
                     <span
-                      className="absolute -right-[3px] top-0 grid size-8 place-items-center rounded-full border border-[#a1ada2] transition-colors group-hover/finder-scene:border-[#ff7a32] group-hover/finder-scene:bg-[#ff7a32] group-hover/finder-scene:text-[#18201b] group-focus-visible/finder-scene:border-[#ff7a32] group-focus-visible/finder-scene:bg-[#ff7a32] group-focus-visible/finder-scene:text-[#18201b] motion-reduce:transition-none max-md:bottom-0 max-md:right-0 max-md:top-auto max-md:size-6 max-md:-translate-y-[82px]"
+                      className="absolute -right-[3px] top-0 grid size-8 place-items-center rounded-full border border-[#a1ada2] transition-colors group-hover/finder-scene:border-primary group-hover/finder-scene:bg-primary group-hover/finder-scene:text-primary-foreground group-focus-visible/finder-scene:border-primary group-focus-visible/finder-scene:bg-primary group-focus-visible/finder-scene:text-primary-foreground motion-reduce:transition-none max-md:bottom-0 max-md:right-0 max-md:top-auto max-md:size-6 max-md:-translate-y-[82px]"
                       aria-hidden="true"
                     >
                       <HugeiconsIcon
@@ -300,7 +303,7 @@ export default function ProductFinder({
                         className={cn(
                           "relative grid h-auto min-h-[86px] w-full grid-cols-[28px_1fr_26px] items-center gap-[15px] whitespace-normal rounded-md border border-[#677268] bg-[#243027] px-6 py-[18px] text-left text-[#f8f7f2] transition-colors hover:border-[#afbaa8] hover:bg-[#344236] hover:text-white motion-reduce:transition-none max-md:min-h-[88px] max-md:grid-cols-[22px_1fr_24px] max-md:gap-2.5 max-md:px-[15px] max-md:py-[17px]",
                           selected &&
-                            "border-[#ff8a4b] bg-[#f7f5ee] text-[#19221c] hover:border-[#ff8a4b] hover:bg-[#f7f5ee] hover:text-[#19221c]"
+                            "border-primary bg-[#f7f5ee] text-[#19221c] hover:border-primary hover:bg-[#f7f5ee] hover:text-[#19221c]"
                         )}
                       >
                         <span
@@ -318,7 +321,7 @@ export default function ProductFinder({
                           className={cn(
                             "grid size-[25px] place-items-center rounded-full border border-[#839383]",
                             selected &&
-                              "border-[#ff7a32] bg-[#ff7a32] text-[#172018]"
+                              "border-primary bg-primary text-primary-foreground"
                           )}
                           aria-hidden="true"
                         >
@@ -375,7 +378,7 @@ export default function ProductFinder({
                     key={product.id}
                     href={"/products/" + product.handle}
                     className={cn(
-                      "group/finder-result grid w-full min-w-0 max-w-[720px] grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-center gap-6 rounded-lg border border-[#e3e0d6] bg-[#f7f5ef] p-6 text-[#172019] transition-[transform,border-color,background-color] duration-200 hover:border-[#ff8a4b] hover:bg-white focus-visible:border-[#ff8a4b] focus-visible:bg-white motion-safe:hover:-translate-y-[3px] motion-safe:focus-visible:-translate-y-[3px] motion-reduce:transition-none max-lg:gap-[18px] max-lg:p-5 max-md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] max-md:gap-[17px] max-md:p-[17px]",
+                      "group/finder-result grid w-full min-w-0 max-w-[720px] grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-center gap-6 rounded-lg border border-[#e3e0d6] bg-[#f7f5ef] p-6 text-[#172019] transition-[transform,border-color,background-color] duration-200 hover:border-primary hover:bg-card focus-visible:border-primary focus-visible:bg-card motion-safe:hover:-translate-y-[3px] motion-safe:focus-visible:-translate-y-[3px] motion-reduce:transition-none max-lg:gap-[18px] max-lg:p-5 max-md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] max-md:gap-[17px] max-md:p-[17px]",
                       focusRing
                     )}
                   >

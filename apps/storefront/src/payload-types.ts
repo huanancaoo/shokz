@@ -73,10 +73,12 @@ export interface Config {
     'commerce-sync': CommerceSync;
     pages: Page;
     posts: Post;
+    categories: Category;
     banners: Banner;
     media: Media;
     'form-uploads': FormUpload;
     'medusa-products': MedusaProduct;
+    'storefront-themes': StorefrontTheme;
     redirects: Redirect;
     search: Search;
     forms: Form;
@@ -86,20 +88,27 @@ export interface Config {
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
+    'payload-folders': FolderInterface;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    'payload-folders': {
+      documentsAndFolders: 'payload-folders' | 'media';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     'commerce-sync': CommerceSyncSelect<false> | CommerceSyncSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     banners: BannersSelect<false> | BannersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'form-uploads': FormUploadsSelect<false> | FormUploadsSelect<true>;
     'medusa-products': MedusaProductsSelect<false> | MedusaProductsSelect<true>;
+    'storefront-themes': StorefrontThemesSelect<false> | StorefrontThemesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -109,6 +118,7 @@ export interface Config {
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
+    'payload-folders': PayloadFoldersSelect<false> | PayloadFoldersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -119,9 +129,15 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ko' | 'en' | 'zh') | ('ko' | 'en' | 'zh')[];
   globals: {
     'site-settings': SiteSetting;
+    'storefront-appearance': StorefrontAppearance;
+    'storefront-header': StorefrontHeader;
+    'storefront-footer': StorefrontFooter;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'storefront-appearance': StorefrontAppearanceSelect<false> | StorefrontAppearanceSelect<true>;
+    'storefront-header': StorefrontHeaderSelect<false> | StorefrontHeaderSelect<true>;
+    'storefront-footer': StorefrontFooterSelect<false> | StorefrontFooterSelect<true>;
   };
   locale: 'ko' | 'en' | 'zh';
   widgets: {
@@ -246,24 +262,59 @@ export interface Page {
   id: number;
   title: string;
   slug: string;
-  body: {
-    root: {
-      type: string;
-      children: {
-        type: any;
+  layout: (PageContentBlock | PageCallToActionBlock | PageMediaBlock | PageArchiveBlock | PageFormBlock)[];
+  hero: {
+    type: 'none' | 'lowImpact' | 'mediumImpact' | 'highImpact';
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
         version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
+      };
+      [k: string]: unknown;
+    } | null;
+    links?:
+      | {
+          link: {
+            label: string;
+            type: 'reference' | 'custom';
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: number | Post;
+                } | null);
+            /**
+             * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+             */
+            url?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    media?: (number | null) | Media;
   };
-  photos?: (number | Media)[] | null;
-  products?: (string | MedusaProduct)[] | null;
   kind: 'editorial' | 'display' | 'membership';
+  products?: (string | MedusaProduct)[] | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   parent?: (number | null) | Page;
   breadcrumbs?:
     | {
@@ -273,14 +324,6 @@ export interface Page {
         id?: string | null;
       }[]
     | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-  };
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -288,44 +331,50 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "PageContentBlock".
  */
-export interface Media {
-  id: number;
-  alt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumb?: {
+export interface PageContentBlock {
+  columns: {
+    size: 'full' | 'half' | 'oneThird' | 'twoThirds';
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    enableLink?: boolean | null;
+    link?: {
+      label: string;
+      type: 'reference' | 'custom';
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: number | Post;
+          } | null);
+      /**
+       * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+       */
       url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
     };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medusa-products".
- */
-export interface MedusaProduct {
-  id: string;
-  title: string;
-  handle: string;
-  thumbnail?: string | null;
-  updatedAt: string;
-  createdAt: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'content';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -351,9 +400,9 @@ export interface Post {
     [k: string]: unknown;
   };
   photos?: (number | Media)[] | null;
-  products?: (string | MedusaProduct)[] | null;
-  category: 'news' | 'guide' | 'event' | 'notify' | 'magazine' | 'interview';
+  categories: (number | Category)[];
   sortOrder: number;
+  products?: (string | MedusaProduct)[] | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -369,36 +418,12 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "banners".
+ * via the `definition` "media".
  */
-export interface Banner {
+export interface Media {
   id: number;
-  title: string;
-  slug: string;
-  caption: string;
-  sortOrder: number;
-  format: 'image' | 'video';
-  desktopImage: number | Media;
-  mobileImage?: (number | null) | Media;
-  desktopVideo?: (number | null) | Media;
-  mobileVideo?: (number | null) | Media;
-  eyebrow?: string | null;
-  headline?: string | null;
-  actionLabel?: string | null;
-  linkType: 'page' | 'product';
-  href?: string | null;
-  product?: (string | null) | MedusaProduct;
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "form-uploads".
- */
-export interface FormUpload {
-  id: number;
+  alt?: string | null;
+  folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -410,52 +435,192 @@ export interface FormUpload {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  from: string;
-  to?: {
-    type?: ('reference' | 'custom') | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
   };
-  type: '307' | '308';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-folders".
+ */
+export interface FolderInterface {
+  id: number;
+  name: string;
+  folder?: (number | null) | FolderInterface;
+  documentsAndFolders?: {
+    docs?: (
+      | {
+          relationTo?: 'payload-folders';
+          value: number | FolderInterface;
+        }
+      | {
+          relationTo?: 'media';
+          value: number | Media;
+        }
+    )[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  folderType?: 'media'[] | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * This is a collection of automatically created search results. These results are used by the global site search and will be updated automatically as documents in the CMS are created or updated.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "search".
+ * via the `definition` "categories".
  */
-export interface Search {
+export interface Category {
   id: number;
-  title?: string | null;
-  priority?: number | null;
-  doc:
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  visibleInJournal?: boolean | null;
+  sortOrder: number;
+  parent?: (number | null) | Category;
+  breadcrumbs?:
     | {
-        relationTo: 'pages';
-        value: number | Page;
-      }
-    | {
-        relationTo: 'posts';
-        value: number | Post;
-      };
+        doc?: (number | null) | Category;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medusa-products".
+ */
+export interface MedusaProduct {
+  id: string;
+  title: string;
+  handle: string;
+  thumbnail?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageCallToActionBlock".
+ */
+export interface PageCallToActionBlock {
+  richText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  links?:
+    | {
+        link: {
+          label: string;
+          type: 'reference' | 'custom';
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          /**
+           * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+           */
+          url?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageMediaBlock".
+ */
+export interface PageMediaBlock {
+  media: (number | Media)[];
+  display: 'featured' | 'gallery';
+  caption?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageArchiveBlock".
+ */
+export interface PageArchiveBlock {
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  populateBy: 'collection' | 'selection';
+  categories?: (number | Category)[] | null;
+  limit?: number | null;
+  selectedDocs?: (number | Post)[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageFormBlock".
+ */
+export interface PageFormBlock {
+  form: number | Form;
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'formBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -669,6 +834,130 @@ export interface Form {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "banners".
+ */
+export interface Banner {
+  id: number;
+  title: string;
+  slug: string;
+  caption: string;
+  sortOrder: number;
+  format: 'image' | 'video';
+  desktopImage: number | Media;
+  mobileImage?: (number | null) | Media;
+  desktopVideo?: (number | null) | Media;
+  mobileVideo?: (number | null) | Media;
+  eyebrow?: string | null;
+  headline?: string | null;
+  actionLabel?: string | null;
+  linkType: 'page' | 'product';
+  href?: string | null;
+  product?: (string | null) | MedusaProduct;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-uploads".
+ */
+export interface FormUpload {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-themes".
+ */
+export interface StorefrontTheme {
+  id: number;
+  name: string;
+  scheme: 'light' | 'dark';
+  colors: {
+    background: string;
+    foreground: string;
+    surface: string;
+    secondary: string;
+    muted: string;
+    mutedForeground: string;
+    border: string;
+    input: string;
+    primary: string;
+    primaryForeground: string;
+    accent: string;
+    accentForeground: string;
+  };
+  fontFamily: 'noto-sans-kr' | 'system-sans' | 'system-serif';
+  cornerRadius: number;
+  buttonShape: 'original' | 'square' | 'rounded' | 'pill';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  from: string;
+  to?: {
+    type?: ('reference' | 'custom') | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+  };
+  type: '307' | '308';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This is a collection of automatically created search results. These results are used by the global site search and will be updated automatically as documents in the CMS are created or updated.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "search".
+ */
+export interface Search {
+  id: number;
+  title?: string | null;
+  priority?: number | null;
+  doc:
+    | {
+        relationTo: 'pages';
+        value: number | Page;
+      }
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      };
+  slug?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  text?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -999,6 +1288,10 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
         relationTo: 'banners';
         value: number | Banner;
       } | null)
@@ -1013,6 +1306,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'medusa-products';
         value: string | MedusaProduct;
+      } | null)
+    | ({
+        relationTo: 'storefront-themes';
+        value: number | StorefrontTheme;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1033,6 +1330,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'payload-mcp-api-keys';
         value: number | PayloadMcpApiKey;
+      } | null)
+    | ({
+        relationTo: 'payload-folders';
+        value: number | FolderInterface;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1138,10 +1439,45 @@ export interface CommerceSyncSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  body?: T;
-  photos?: T;
-  products?: T;
+  layout?:
+    | T
+    | {
+        content?: T | PageContentBlockSelect<T>;
+        cta?: T | PageCallToActionBlockSelect<T>;
+        mediaBlock?: T | PageMediaBlockSelect<T>;
+        archive?: T | PageArchiveBlockSelect<T>;
+        formBlock?: T | PageFormBlockSelect<T>;
+      };
+  hero?:
+    | T
+    | {
+        type?: T;
+        richText?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+              id?: T;
+            };
+        media?: T;
+      };
   kind?: T;
+  products?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   parent?: T;
   breadcrumbs?:
     | T
@@ -1151,6 +1487,105 @@ export interface PagesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageContentBlock_select".
+ */
+export interface PageContentBlockSelect<T extends boolean = true> {
+  columns?:
+    | T
+    | {
+        size?: T;
+        richText?: T;
+        enableLink?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageCallToActionBlock_select".
+ */
+export interface PageCallToActionBlockSelect<T extends boolean = true> {
+  richText?: T;
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageMediaBlock_select".
+ */
+export interface PageMediaBlockSelect<T extends boolean = true> {
+  media?: T;
+  display?: T;
+  caption?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageArchiveBlock_select".
+ */
+export interface PageArchiveBlockSelect<T extends boolean = true> {
+  introContent?: T;
+  populateBy?: T;
+  categories?: T;
+  limit?: T;
+  selectedDocs?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageFormBlock_select".
+ */
+export interface PageFormBlockSelect<T extends boolean = true> {
+  form?: T;
+  introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  body?: T;
+  photos?: T;
+  categories?: T;
+  sortOrder?: T;
+  products?: T;
   meta?:
     | T
     | {
@@ -1165,27 +1600,25 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts_select".
+ * via the `definition` "categories_select".
  */
-export interface PostsSelect<T extends boolean = true> {
+export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
   slug?: T;
-  body?: T;
-  photos?: T;
-  products?: T;
-  category?: T;
+  visibleInJournal?: T;
   sortOrder?: T;
-  meta?:
+  parent?: T;
+  breadcrumbs?:
     | T
     | {
-        title?: T;
-        description?: T;
-        image?: T;
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;
-  deletedAt?: T;
-  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1218,6 +1651,7 @@ export interface BannersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  folder?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1275,6 +1709,35 @@ export interface MedusaProductsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-themes_select".
+ */
+export interface StorefrontThemesSelect<T extends boolean = true> {
+  name?: T;
+  scheme?: T;
+  colors?:
+    | T
+    | {
+        background?: T;
+        foreground?: T;
+        surface?: T;
+        secondary?: T;
+        muted?: T;
+        mutedForeground?: T;
+        border?: T;
+        input?: T;
+        primary?: T;
+        primaryForeground?: T;
+        accent?: T;
+        accentForeground?: T;
+      };
+  fontFamily?: T;
+  cornerRadius?: T;
+  buttonShape?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -1298,6 +1761,14 @@ export interface SearchSelect<T extends boolean = true> {
   title?: T;
   priority?: T;
   doc?: T;
+  slug?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  text?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1652,6 +2123,18 @@ export interface PayloadJobsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-folders_select".
+ */
+export interface PayloadFoldersSelect<T extends boolean = true> {
+  name?: T;
+  folder?: T;
+  documentsAndFolders?: T;
+  folderType?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -1694,12 +2177,280 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * 保存后，店面的所有页面使用所选主题。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-appearance".
+ */
+export interface StorefrontAppearance {
+  id: number;
+  activeTheme: number | StorefrontTheme;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * 保存后应用到店面的桌面和移动端页眉。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-header".
+ */
+export interface StorefrontHeader {
+  id: number;
+  /**
+   * 使用透明背景的 PNG 或 WebP。页脚和结账页也使用此 Logo。
+   */
+  logo: number | Media;
+  /**
+   * 商品分类会从 Medusa 自动读取。
+   */
+  catalog: {
+    label: string;
+    compareLabel: string;
+  };
+  navItems?:
+    | {
+        link: {
+          label: string;
+          type: 'reference' | 'custom';
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          /**
+           * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+           */
+          url?: string | null;
+        };
+        /**
+         * 留空时使用同一个显示名称。
+         */
+        mobileLabel?: string | null;
+        children?:
+          | {
+              link: {
+                label: string;
+                type: 'reference' | 'custom';
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                /**
+                 * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+                 */
+                url?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  mobileSubtitle: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * 保存后应用到店面页脚。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-footer".
+ */
+export interface StorefrontFooter {
+  id: number;
+  tagline: string;
+  marketLabel: string;
+  /**
+   * 商品分类会从 Medusa 自动读取。
+   */
+  catalog: {
+    label: string;
+    storeLabel: string;
+    compareLabel: string;
+  };
+  columns?:
+    | {
+        label: string;
+        navItems?:
+          | {
+              link: {
+                label: string;
+                type: 'reference' | 'custom';
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                /**
+                 * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+                 */
+                url?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  copyright: string;
+  policies?:
+    | {
+        link: {
+          label: string;
+          type: 'reference' | 'custom';
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          /**
+           * 站内填写不含地区前缀的路径，如 /pages/faq。站外填写 HTTPS 地址。
+           */
+          url?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-appearance_select".
+ */
+export interface StorefrontAppearanceSelect<T extends boolean = true> {
+  activeTheme?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-header_select".
+ */
+export interface StorefrontHeaderSelect<T extends boolean = true> {
+  logo?: T;
+  catalog?:
+    | T
+    | {
+        label?: T;
+        compareLabel?: T;
+      };
+  navItems?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+        mobileLabel?: T;
+        children?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  mobileSubtitle?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storefront-footer_select".
+ */
+export interface StorefrontFooterSelect<T extends boolean = true> {
+  tagline?: T;
+  marketLabel?: T;
+  catalog?:
+    | T
+    | {
+        label?: T;
+        storeLabel?: T;
+        compareLabel?: T;
+      };
+  columns?:
+    | T
+    | {
+        label?: T;
+        navItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  copyright?: T;
+  policies?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1738,10 +2489,12 @@ export interface TaskCreateCollectionExport {
       | 'commerce-sync'
       | 'pages'
       | 'posts'
+      | 'categories'
       | 'banners'
       | 'media'
       | 'form-uploads'
       | 'medusa-products'
+      | 'storefront-themes'
       | 'redirects'
       | 'search'
       | 'forms'

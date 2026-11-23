@@ -50,7 +50,7 @@ export default function Squad() {
       >
         {home.athletes.map((athlete, index) => (
           <TabsContent
-            className="relative col-start-1 row-start-1 isolate min-h-[590px] min-w-0 outline-offset-[-4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#ff6008] md:min-h-[clamp(560px,45vw,730px)]"
+            className="relative col-start-1 row-start-1 isolate min-h-[590px] min-w-0 outline-offset-[-4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring md:min-h-[clamp(560px,45vw,730px)]"
             value={athlete.id}
             key={athlete.id}
             tabIndex={0}
@@ -91,7 +91,7 @@ export default function Squad() {
                 >
                   스토리 알아보기
                   <span
-                    className="grid h-[42px] w-[42px] place-items-center rounded-full bg-[#ff6008] text-[#171717] transition-[transform,background-color] duration-200 group-hover:translate-x-[5px] group-hover:bg-[#ff813f] group-focus-visible:translate-x-[5px] group-focus-visible:bg-[#ff813f] motion-reduce:transition-none md:h-[46px] md:w-[46px]"
+                    className="grid h-[42px] w-[42px] place-items-center rounded-full bg-primary text-primary-foreground transition-[transform,background-color] duration-200 group-hover:translate-x-[5px] group-hover:bg-primary/80 group-focus-visible:translate-x-[5px] group-focus-visible:bg-primary/80 motion-reduce:transition-none md:h-[46px] md:w-[46px]"
                     aria-hidden="true"
                   >
                     <HugeiconsIcon icon={ArrowRight01Icon} size={21} />
@@ -130,7 +130,7 @@ export default function Squad() {
               >
                 <Image
                   className={cn(
-                    "h-12 w-[38px] shrink-0 rounded-[3px] bg-[#30373d] object-cover object-top transition-opacity duration-200 group-hover:opacity-100 motion-reduce:transition-none md:h-[54px] md:w-11",
+                    "h-12 w-[38px] shrink-0 rounded-[calc(3px*var(--storefront-radius-scale))] bg-[#30373d] object-cover object-top transition-opacity duration-200 group-hover:opacity-100 motion-reduce:transition-none md:h-[54px] md:w-11",
                     active === index ? "opacity-100" : "opacity-70"
                   )}
                   src={item.avatar}

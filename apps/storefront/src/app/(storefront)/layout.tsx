@@ -1,4 +1,6 @@
 import { getBaseURL } from "@lib/util/env"
+import { getStorefrontTheme } from "@lib/data/cms"
+import { storefrontThemeStyle } from "@lib/storefront-theme"
 import { Metadata } from "next"
 import "@/styles/globals.css"
 import CompareProvider from "@lib/context/compare-context"
@@ -7,9 +9,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
 }
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default async function RootLayout(props: { children: React.ReactNode }) {
+  const theme = await getStorefrontTheme()
+
   return (
-    <html lang="ko" data-mode="light">
+    <html
+      className={theme.scheme === "dark" ? "dark" : undefined}
+      data-button-shape={theme.buttonShape}
+      data-mode={theme.scheme}
+      lang="ko"
+      style={storefrontThemeStyle(theme)}
+    >
       <head>
         <link rel="ucp" href="/.well-known/ucp" />
       </head>

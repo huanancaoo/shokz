@@ -79,7 +79,7 @@ export default function ContentRail({
         id={id}
         ref={rail}
         className={cn(
-          "overflow-x-auto overscroll-x-contain [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6008]",
+          "overflow-x-auto overscroll-x-contain [scroll-snap-type:x_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           className
         )}
         role="region"
@@ -122,7 +122,7 @@ export default function ContentRail({
           <Button
             variant="outline"
             size="icon"
-            className="h-11 w-11 rounded-full border-[#d9d4ca] bg-white transition-[background-color,border-color,transform] hover:-translate-y-0.5 hover:border-[#ff6008] hover:bg-[#ff6008] disabled:opacity-30"
+            className="h-11 w-11 rounded-full border-border bg-card transition-[background-color,border-color,transform] hover:-translate-y-0.5 hover:border-primary hover:bg-primary disabled:opacity-30"
             aria-label={`이전 ${label}`}
             aria-controls={id}
             disabled={position.start}
@@ -133,7 +133,7 @@ export default function ContentRail({
           <Button
             variant="outline"
             size="icon"
-            className="h-11 w-11 rounded-full border-[#d9d4ca] bg-white transition-[background-color,border-color,transform] hover:-translate-y-0.5 hover:border-[#ff6008] hover:bg-[#ff6008] disabled:opacity-30"
+            className="h-11 w-11 rounded-full border-border bg-card transition-[background-color,border-color,transform] hover:-translate-y-0.5 hover:border-primary hover:bg-primary disabled:opacity-30"
             aria-label={`다음 ${label}`}
             aria-controls={id}
             disabled={position.end}

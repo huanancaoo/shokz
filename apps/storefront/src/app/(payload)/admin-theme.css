@@ -204,6 +204,12 @@
   color: hsl(var(--muted-foreground));
 }
 
+.shokz-cms .storefront-theme-palette .group-field__wrap > .render-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1.25rem;
+}
+
 /* Payload 的遮罩单独绘制模糊层，保留原生遮罩的交互层。 */
 .shokz-cms :is(
   .confirmation-modal,

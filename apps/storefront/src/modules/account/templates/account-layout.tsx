@@ -18,7 +18,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   if (!customer) {
     return (
       <div
-        className="bg-[#f5f4ef] px-5 pb-12 pt-9 md:px-8 xl:px-16 max-[900px]:py-[26px] max-[480px]:bg-white max-[480px]:p-0"
+        className="bg-muted px-5 pb-12 pt-9 md:px-8 xl:px-16 max-[900px]:py-[26px] max-[480px]:bg-card max-[480px]:p-0"
         data-testid="account-page"
       >
         {children}

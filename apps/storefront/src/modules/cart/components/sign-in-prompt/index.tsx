@@ -4,7 +4,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const SignInPrompt = () => {
   return (
-    <div className="bg-white flex items-center justify-between">
+    <div className="bg-card flex items-center justify-between">
       <div>
         <Heading level="h2" className="text-xl">
           이미 계정이 있으신가요?
